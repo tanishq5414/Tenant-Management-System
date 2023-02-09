@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "447838458565",
+    "project_id": "tenantmanagement-8b61d",
+    "storage_bucket": "tenantmanagement-8b61d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447838458565:android:1a08a3d9442cd7cbfd56ac",
+        "android_client_info": {
+          "package_name": "com.example.tenantmgmnt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "447838458565-b1n3hcb8p1hb0jjc7s8mla7t4oof1vna.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tenantmgmnt",
+            "certificate_hash": "2024d710179fd605ed4791922cf59e387e3317e2"
+          }
+        },
+        {
+          "client_id": "447838458565-l0vkukthk6b4rntjcdv7a5u24gt3dlt5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAlNDRAu3Skn9rdCb2fLdDHUnrEk-Zckw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "447838458565-l0vkukthk6b4rntjcdv7a5u24gt3dlt5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "447838458565-aio623m9u3opasvuitp86296fureoqd8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tenantmgmnt"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

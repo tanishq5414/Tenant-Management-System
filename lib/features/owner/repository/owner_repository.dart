@@ -15,20 +15,21 @@ import 'package:tenantmgmnt/core/providers/providers.dart';
 import 'package:tenantmgmnt/core/type_def.dart';
 import 'package:tenantmgmnt/features/auth/showOtp.dart';
 import 'package:tenantmgmnt/features/components/snack_bar.dart';
+import 'package:tenantmgmnt/modal/flats_modal.dart';
 import 'package:tenantmgmnt/modal/owner_modal.dart';
 import 'package:tenantmgmnt/modal/property_modal.dart';
 import 'package:tenantmgmnt/modal/tenant_modal.dart';
 import 'package:uuid/uuid.dart';
 
-final authRepositoryProvider = Provider(
-  (ref) => AuthRepository(
+final ownerRepositoryProvider = Provider(
+  (ref) => OwnerRepository(
     supabaseClient: ref.read(supabaseProvider),
     auth: ref.read(authProvider),
   ),
 );
 
-class AuthRepository {
-  AuthRepository({
+class OwnerRepository {
+  OwnerRepository({
     required supabase.SupabaseClient supabaseClient,
     required FirebaseAuth auth,
   })  : _auth = auth,
@@ -40,101 +41,6 @@ class AuthRepository {
   User get user => _auth.currentUser!;
 
   Stream<User?> get authStateChange => _auth.authStateChanges();
-
-  // Phone sign up
-  Future<void> phoneSignIn(
-    BuildContext context,
-    String phoneNumber,
-  ) async {
-    TextEditingController codeController = TextEditingController();
-    if (kIsWeb) {
-      // !!! Works only on web !!!
-      ConfirmationResult result =
-          await _auth.signInWithPhoneNumber(phoneNumber);
-      void onPressed() async {
-        PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: result.verificationId,
-          smsCode: codeController.text.trim(),
-        );
-        await _auth.signInWithCredential(credential);
-        Routemaster.of(context).pop(); // Remove the dialog box
-      }
-
-      Routemaster.of(context).push(
-          '/otpscreen/?codecontroller=$codeController&onPressed=$onPressed()');
-    } else {
-      // FOR ANDROID, IOS
-      await _auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        //  Automatic handling of the SMS code
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // !!! works only on android !!!
-          await _auth.signInWithCredential(credential);
-        },
-        // Displays a message when verification fails
-        verificationFailed: (e) {
-          Utils.showSnackBar(e.message!);
-        },
-        // Displays a dialog box when OTP is sent
-        codeSent: ((String verificationId, int? resendToken) async {
-          showOTPDialog(
-              codeController: codeController,
-              context: context,
-              onPressed: () async {
-                PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                  verificationId: verificationId,
-                  smsCode: codeController.text.trim(),
-                );
-
-                // !!! Works only on Android, iOS !!!
-                var usercredential =
-                    await _auth.signInWithCredential(credential);
-                Routemaster.of(context).pop(); // Remove the dialog box
-                if (usercredential.additionalUserInfo!.isNewUser) {
-                  Routemaster.of(context).push('/signupdata');
-                } else {
-                  Routemaster.of(context).push('/');
-                }
-              });
-        }),
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Auto-resolution timed out...
-        },
-      );
-    }
-  }
-
-  FutureEither<Tenant> insertTenantFirstDetails(
-    BuildContext context,
-    String firstName,
-    String lastName,
-    String email,
-    String phone,
-    String typeofuser,
-  ) async {
-    final user = _auth.currentUser!;
-    user.updateProfile(displayName: firstName + ' ' + lastName);
-    // user.updateEmail(email);
-    Tenant user1 = Tenant(
-      id: user.uid,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      phone: user.phoneNumber,
-    );
-    var response = await _supabaseClient.from('tenant').insert([
-      {
-        'id': user.uid,
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'phone': user.phoneNumber,
-      }
-    ]).execute();
-    print(response.data);
-    return right(user1);
-  }
-
   FutureEither<OwnerModal> insertOwnerFirstDetails(
     BuildContext context,
     String firstName,
@@ -181,11 +87,7 @@ class AuthRepository {
     return right(user1);
   }
 
-  void signOut() async {
-    await _auth.signOut();
-    await _supabaseClient.auth.signOut();
-  }
-
+  // add properties
   void addProperty(
     BuildContext context,
     List propertyList,
@@ -210,6 +112,7 @@ class AuthRepository {
         'zip': propertyZip,
         'tenants': [],
         'image': propertyimage,
+        'flats': [],
       }
     ]).execute();
     var response = await _supabaseClient
@@ -224,13 +127,18 @@ class AuthRepository {
   FutureEither<List<Property>> getPropertyData(String uid) async {
     //get full table from supabase
     List<Property> propertyList = [];
+    print('tanishq');
     var response = await _supabaseClient
         .from('property')
         .select()
         .eq('ownerId', uid)
         .execute()
         .then((value) {
-      for (var i = 0; i < value.data.length; i++) {
+      print(value.data);
+      List data = value.data;
+      var n = data.length;
+      print(n);
+      for (int i = 0; i < n; i++) {
         propertyList.add(Property(
           id: value.data[i]['id'],
           ownerId: value.data[i]['ownerId'],
@@ -238,14 +146,14 @@ class AuthRepository {
           area: value.data[i]['area'],
           city: value.data[i]['city'],
           state: value.data[i]['state'],
+          flats: value.data[i]['flats']??[],
           zip: value.data[i]['zip'],
           tenants: value.data[i]['tenants'],
           image: value.data[i]['image'],
-          flats: value.data[i]['flats'],
         ));
       }
     });
-    print(response);
+    print('agarwal');
     if (response != null) {
       return left(Failure(response.data));
     }
@@ -275,5 +183,81 @@ class AuthRepository {
               tenantList: event.elementAt(0)['tenantList']);
         });
     return user;
+  }
+
+  // add Flats
+  void addFlat(
+    BuildContext context,
+    String name,
+    String description,
+    String tenantId,
+    String rent,
+    String deposit,
+    String due,
+    List complaints,
+    List payments,
+    List flatlist,
+    String propertyid,
+  ) {
+    var flatid = Uuid().v4();
+    flatlist.add(flatid);
+    var response = _supabaseClient.from('flats').insert([
+      {
+        'id': flatid,
+        'name': name,
+        'description': description,
+        'tenantId': tenantId,
+        'rent': rent,
+        'deposit': deposit,
+        'due': due,
+        'complaints': complaints,
+        'payments': payments,
+        'propertyId': propertyid,
+      }
+    ]).execute();
+
+    var response1 = _supabaseClient
+        .from('property')
+        .update({
+          'flats': flatlist,
+        })
+        .eq('id', 'propertyid')
+        .execute();
+  }
+
+  getFlatData(context, String propertyid) {
+    // Stream<List<FlatsModal>> flatlist = [];
+
+    var response1 = _supabaseClient
+        .from('flats')
+        .stream(primaryKey: ['id'])
+        .eq('id', propertyid)
+        .map(
+          (event) => event.map((e) => print(e)),
+        );
+    // var response = await _supabaseClient
+    //     .from('flats')
+    //     .select()
+    //     .eq('id', 'flatid')
+    //     .then((value) => {
+    //           for (var i = 0; i < value.data.length; i++)
+    //             {
+    //               flatlist.add(FlatsModal(
+    //                 id: value.data[i]['id'],
+    //                 name: value.data[i]['name'],
+    //                 description: value.data[i]['description'],
+    //                 TenantId: value.data[i]['tenantId'],
+    //                 Rent: value.data[i]['rent'],
+    //                 Deposit: value.data[i]['deposit'],
+    //                 Due: value.data[i]['due'],
+    //                 Complaints: value.data[i]['complaints'],
+    //                 Payments: value.data[i]['payments'],
+    //               ))
+    //             }
+    //         });
+    // if (response != null) {
+    //   return left(Failure(response.toString()));
+    // }
+    // return right(flatlist);
   }
 }

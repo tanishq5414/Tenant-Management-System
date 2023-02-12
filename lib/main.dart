@@ -8,6 +8,7 @@ import 'package:tenantmgmnt/core/providers/apikeys.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
 import 'package:tenantmgmnt/features/auth/signin_main.dart';
 import 'package:tenantmgmnt/features/components/snack_bar.dart';
+import 'package:tenantmgmnt/features/owner/controller/owner_controller.dart';
 import 'package:tenantmgmnt/router.dart';
 
 void main() async {
@@ -42,14 +43,15 @@ class _MyAppState extends ConsumerState<MyApp> {
                 routesBuilder: (context) {
                   // getData(ref, data!);
                   if (data != null) {
+                    print(1);
                     initialization() async {
+                      print(2);
                       var u = await ref
                           .read(authControllerProvider.notifier)
-                          .getOwnerData(data.uid).first;
+                          .getOwnerData(data.uid)
+                          .first;
+                      print(3);
                       ref.read(ownerDataProvider.notifier).update((state) => u);
-                      
-                      // await getData(ref, data);
-                      // FlutterNativeSplash.remove();
                     }
 
                     initialization();

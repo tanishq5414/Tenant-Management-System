@@ -7,6 +7,7 @@ import 'package:tenantmgmnt/features/auth/components/side_heading.dart';
 import 'package:tenantmgmnt/features/components/text_controller.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
 import 'package:tenantmgmnt/features/auth/signin_main.dart';
+import 'package:tenantmgmnt/features/owner/controller/owner_controller.dart';
 import 'package:tenantmgmnt/themes/colors.dart';
 
 // create a type of stateful widget
@@ -173,7 +174,7 @@ class _SignUpDataState extends ConsumerState<SignUpData> {
                               typeofuser: dropdownValue);
                     } else if (dropdownValue == 'I am a landlord') {
                       ref
-                          .read(authControllerProvider.notifier)
+                          .read(ownerControllerProvider.notifier)
                           .insertOwnerFirstDetails(
                               context: context,
                               firstName: firstNameController.text,

@@ -10,7 +10,6 @@ import 'package:tenantmgmnt/modal/owner_modal.dart';
 import 'package:tenantmgmnt/modal/property_modal.dart';
 import '../../components/snack_bar.dart';
 
-final ownerDataProvider = StateProvider<OwnerModal?>((ref) => null);
 
 final authControllerProvider = StateNotifierProvider<AuthController, bool>(
   (ref) => AuthController(
@@ -53,9 +52,6 @@ class AuthController extends StateNotifier<bool> {
     // });
   }
 
-  // Stream<UserCollection> getUserData(String uid) {
-  //   return _authRepository.getUserData(uid);
-  // }
   void insertTenantFirstDetails({
     required BuildContext context,
     required String firstName,
@@ -68,42 +64,46 @@ class AuthController extends StateNotifier<bool> {
         context, firstName, lastName, email, phone, typeofuser);
   }
 
-  void insertOwnerFirstDetails({
-    required BuildContext context,
-    required String firstName,
-    required String lastName,
-    required String email,
-    required String phone,
-    required String typeofuser,
-  }) async {
-    final user = await _authRepository.insertOwnerFirstDetails(
-        context, firstName, lastName, email, phone, typeofuser);
-    user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
-      _ref.read(ownerDataProvider.notifier).update((state) => userModel);
-    });
-    Routemaster.of(context).popUntil((routeData) => false);
-  }
+  // void insertOwnerFirstDetails({
+  //   required BuildContext context,
+  //   required String firstName,
+  //   required String lastName,
+  //   required String email,
+  //   required String phone,
+  //   required String typeofuser,
+  // }) async {
+  //   final user = await _authRepository.insertOwnerFirstDetails(
+  //       context, firstName, lastName, email, phone, typeofuser);
+  //   user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
+  //     _ref.read(ownerDataProvider.notifier).update((state) => userModel);
+  //   });
+  //   Routemaster.of(context).popUntil((routeData) => false);
+  // }
 
-  void addProperty({
-    required BuildContext context,
-    required List userpropertylist,
-    required String propertyname,
-    required String propertycity,
-    required String propertystate,
-    required String propertyzipcode,
-  }) {
-    final user = _authRepository.addProperty(context, userpropertylist,
-        propertyname, propertycity, propertystate, propertyzipcode);
-  }
+  // void addProperty({
+  //   required BuildContext context,
+  //   required List userpropertylist,
+  //   required String propertyname,
+  //   required String propertyarea,
+  //   required String propertycity,
+  //   required String propertystate,
+  //   required String propertyzipcode,
+  //   required String propertyimage,
+  // }) {
+  //   final user = _authRepository.addProperty(context, userpropertylist,
+  //       propertyname, propertyarea,propertycity, propertystate, propertyzipcode, propertyimage);
+  // }
 
-  Future<List<Property>> getPropertyData(String uid) async {
-    late List<Property> u = [];
-    final user = await _authRepository.getPropertyData(uid);
-    user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
-      return userModel;
-    });
-    return u;
-  }
+  // Future<List<Property>> getPropertyData(String uid) async {
+  //   // late List<Property> u = [];
+  //   var u;
+  //   final user = await _authRepository.getPropertyData(uid);
+  //   user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
+  //     u = userModel;
+  //   });
+  //   return u;
+  //   // return u;
+  // }
   // Stream<User?> get authStateChange => _authRepository.authStateChange;
   // void signInWithGoogle(BuildContext context) async {
   //   state = true;

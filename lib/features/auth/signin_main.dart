@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:routemaster/routemaster.dart';
-import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/auth/components/main_button.dart';
 import 'package:tenantmgmnt/features/auth/components/main_heading.dart';
-import 'package:tenantmgmnt/features/auth/components/show_snack_bar.dart';
-import 'package:tenantmgmnt/features/auth/components/side_heading.dart';
 import 'package:tenantmgmnt/features/components/text_controller.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
 import 'package:tenantmgmnt/themes/colors.dart';

@@ -190,23 +190,26 @@ class AuthRepository {
     BuildContext context,
     List propertyList,
     String propertyName,
+    String propertyArea,
     String propertyCity,
     String propertyState,
     String propertyZip,
+    String propertyimage,
   ) async {
     final user = _auth.currentUser!;
     var propertyid = Uuid().v4();
-    print(propertyid);
     propertyList.add(propertyid);
     var response1 = await _supabaseClient.from('property').insert([
       {
         'id': propertyid,
         'ownerId': user.uid,
         'name': propertyName,
+        'area': propertyArea,
         'city': propertyCity,
         'state': propertyState,
         'zip': propertyZip,
         'tenants': [],
+        'image': propertyimage,
       }
     ]).execute();
     var response = await _supabaseClient
@@ -217,7 +220,6 @@ class AuthRepository {
         .eq('id', user.uid)
         .execute();
 
-    print(response.data);
   }
 
   FutureEither<List<Property>> getPropertyData(String uid) async {
@@ -234,10 +236,13 @@ class AuthRepository {
           id: value.data[i]['id'],
           ownerId: value.data[i]['ownerId'],
           name: value.data[i]['name'],
+          area: value.data[i]['area'],
           city: value.data[i]['city'],
           state: value.data[i]['state'],
           zip: value.data[i]['zip'],
           tenants: value.data[i]['tenants'],
+          image: value.data[i]['image'],
+          flats: value.data[i]['flats'],
         ));
       }
     });

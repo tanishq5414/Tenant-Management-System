@@ -50,6 +50,7 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
             ref.read(complaintDataProvider.notifier).update((state) => b);
           }
         } else {
+          print('owner');
           flag = 0;
           var u = await ref
               .read(ownerControllerProvider.notifier)
@@ -67,10 +68,10 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
 
     loading();
     if (flag == 0) {
-      print('home screen returned');
+      print('owner screen returned');
       return const OwnerHomeScreen();
     } else if (flag == 1) {
-      print('home screen returned'); 
+      print('home screen returned');
       return const TenantHome();
     } else {
       print("home screen not returned");

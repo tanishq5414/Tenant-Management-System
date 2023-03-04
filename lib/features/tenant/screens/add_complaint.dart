@@ -26,8 +26,8 @@ class _AddComplaints extends ConsumerState<AddComplaints> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final user = ref.watch(tenantDataProvider)!;
-    final flatsdata = ref.watch(flatDataProvider)!;
-    return Scaffold(
+    final flatsdata = ref.watch(flatDataProvider);
+    return (flatsdata != null)?Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
         title: 'add a complaint',
@@ -88,6 +88,14 @@ class _AddComplaints extends ConsumerState<AddComplaints> {
           ),
         ],
       ),
-    );
+    ):Scaffold(
+        backgroundColor: appBackgroundColor,
+        appBar: CustomAppBar(
+          title: 'add a complaint'
+        ),
+        body: const Center(
+          child: Text('Flat is not assigned yet'),
+        ),
+      );
   }
 }

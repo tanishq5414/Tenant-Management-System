@@ -18,6 +18,7 @@ import 'package:tenantmgmnt/features/components/snack_bar.dart';
 import 'package:tenantmgmnt/modal/owner_modal.dart';
 import 'package:tenantmgmnt/modal/property_modal.dart';
 import 'package:tenantmgmnt/modal/tenant_modal.dart';
+import 'package:tenantmgmnt/modal/user_type_modal.dart';
 import 'package:uuid/uuid.dart';
 
 final authRepositoryProvider = Provider(
@@ -104,6 +105,21 @@ class AuthRepository {
     }
   }
 
+  //tenant or owner sign up
+  Stream<UserType> tenantorowner(uid) {
+    var response = _supabaseClient
+        .from('user_details')
+        .stream(primaryKey: ['id'])
+        .eq('id', uid)
+        .map((event) {
+          return UserType(
+            id: event.elementAt(0)['id'],
+            user_type: event.elementAt(0)['user_type'],
+          );
+        });
+    return response;
+  }
+
   FutureEither<Tenant> insertTenantFirstDetails(
     BuildContext context,
     String firstName,
@@ -120,18 +136,23 @@ class AuthRepository {
       firstName: firstName,
       lastName: lastName,
       email: email,
-      phone: user.phoneNumber,
+      phone: user.phoneNumber!,
+      address: '',
+      city: '',
+      state: '',
+      zip: '',
+      country: '',
+      flatId: '',
+      transactions: [],
+      complaints: [],
     );
-    var response = await _supabaseClient.from('tenant').insert([
-      {
-        'id': user.uid,
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'phone': user.phoneNumber,
-      }
-    ]).execute();
-    print(response.data);
+    var response = await _supabaseClient.rpc('inserttenantdetails', params: {
+      'id': user.uid,
+      'firstname': firstName,
+      'lastname': lastName,
+      'email': email,
+      'phone': phone,
+    }).execute();
     return right(user1);
   }
 
@@ -160,21 +181,34 @@ class AuthRepository {
       propertyList: [],
       tenantList: [],
     );
-    var response = await _supabaseClient.from('owner').insert([
-      {
-        'id': user.uid,
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'phone': phone,
-        'address': '',
-        'city': '',
-        'state': '',
-        'zip': '',
-        'country': '',
-        'propertyList': [],
-      }
-    ]).execute();
+    // var response = await _supabaseClient.from('owner').insert([
+    //   {
+    //     'id': user.uid,
+    //     'firstName': firstName,
+    //     'lastName': lastName,
+    //     'email': email,
+    //     'phone': phone,
+    //     'address': '',
+    //     'city': '',
+    //     'state': '',
+    //     'zip': '',
+    //     'country': '',
+    //     'propertyList': [],
+    //   }
+    // ]).execute();
+    var response = await _supabaseClient.rpc('insertownerdetails', params: {
+      'id': user.uid,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'phone': phone,
+      'address': ' ',
+      'city': ' ',
+      'state': ' ',
+      'zip': ' ',
+      'country': ' ',
+    }).execute();
+    print(response.data);
     if (response != null) {
       return left(Failure(response.data));
     }
@@ -183,97 +217,5 @@ class AuthRepository {
 
   void signOut() async {
     await _auth.signOut();
-    await _supabaseClient.auth.signOut();
-  }
-
-  void addProperty(
-    BuildContext context,
-    List propertyList,
-    String propertyName,
-    String propertyArea,
-    String propertyCity,
-    String propertyState,
-    String propertyZip,
-    String propertyimage,
-  ) async {
-    final user = _auth.currentUser!;
-    var propertyid = Uuid().v4();
-    propertyList.add(propertyid);
-    var response1 = await _supabaseClient.from('property').insert([
-      {
-        'id': propertyid,
-        'ownerId': user.uid,
-        'name': propertyName,
-        'area': propertyArea,
-        'city': propertyCity,
-        'state': propertyState,
-        'zip': propertyZip,
-        'tenants': [],
-        'image': propertyimage,
-      }
-    ]).execute();
-    var response = await _supabaseClient
-        .from('owner')
-        .update({
-          'propertyList': propertyList,
-        })
-        .eq('id', user.uid)
-        .execute();
-  }
-
-  FutureEither<List<Property>> getPropertyData(String uid) async {
-    //get full table from supabase
-    List<Property> propertyList = [];
-    var response = await _supabaseClient
-        .from('property')
-        .select()
-        .eq('ownerId', uid)
-        .execute()
-        .then((value) {
-      for (var i = 0; i < value.data.length; i++) {
-        propertyList.add(Property(
-          id: value.data[i]['id'],
-          ownerId: value.data[i]['ownerId'],
-          name: value.data[i]['name'],
-          area: value.data[i]['area'],
-          city: value.data[i]['city'],
-          state: value.data[i]['state'],
-          zip: value.data[i]['zip'],
-          tenants: value.data[i]['tenants'],
-          image: value.data[i]['image'],
-          flats: value.data[i]['flats'],
-        ));
-      }
-    });
-    print(response);
-    if (response != null) {
-      return left(Failure(response.data));
-    }
-    // print(propertyList);
-    return right(propertyList);
-  }
-
-  Stream<OwnerModal> getOwnerData(String uid) {
-    Stream<OwnerModal> user;
-    user = _supabaseClient
-        .from('owner')
-        .stream(primaryKey: ['id'])
-        .eq('id', uid)
-        .map((event) {
-          return OwnerModal(
-              id: event.elementAt(0)['id'],
-              firstName: event.elementAt(0)['firstName'],
-              lastName: event.elementAt(0)['lastName'],
-              email: event.elementAt(0)['email'],
-              phone: event.elementAt(0)['phone'],
-              address: event.elementAt(0)['address'],
-              city: event.elementAt(0)['city'],
-              state: event.elementAt(0)['state'],
-              zip: event.elementAt(0)['pincode'],
-              country: event.elementAt(0)['country'],
-              propertyList: event.elementAt(0)['propertyList'],
-              tenantList: event.elementAt(0)['tenantList']);
-        });
-    return user;
   }
 }

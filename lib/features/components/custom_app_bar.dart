@@ -26,7 +26,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             size: 15,
           ),
           onPressed: () {
-            Routemaster.of(context).pop();
+            Routemaster.of(context).history.back();
           }):Container(),
       title: Text(
         title,

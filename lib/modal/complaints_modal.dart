@@ -7,16 +7,16 @@ class Complaint {
   String id;
   String tenantId;
   String ownerId;
-  String propertyId;
+  String flatId;
   String subject;
   String description;
   String createdAt;
   String status;
-  List images;
+  String images;
   Complaint({
     required this.id,
     required this.tenantId,
-    required this.propertyId,
+    required this.flatId,
     required this.ownerId,
     required this.subject,
     required this.description,
@@ -33,13 +33,13 @@ class Complaint {
     String? description,
     String? createdAt,
     String? status,
-    List? images,
-    String? propertyId,
+    String? images,
+    String? flatId,
   }) {
     return Complaint(
       id: id ?? this.id,
       tenantId: tenantId ?? this.tenantId,
-      propertyId: propertyId ?? this.propertyId,
+      flatId: flatId ?? this.flatId,
       ownerId: ownerId ?? this.ownerId,
       subject: subject ?? this.subject,
       description: description ?? this.description,
@@ -53,7 +53,7 @@ class Complaint {
     return <String, dynamic>{
       'id': id,
       'tenantId': tenantId,
-      'propertyId': propertyId,
+      'propertyId': flatId,
       'ownerId': ownerId,
       'subject': subject,
       'description': description,
@@ -67,15 +67,13 @@ class Complaint {
     return Complaint(
         id: map['id'] as String,
         tenantId: map['tenantId'] as String,
-        propertyId: map['propertyId'] as String,
+        flatId: map['propertyId'] as String,
         ownerId: map['ownerId'] as String,
         subject: map['subject'] as String,
         description: map['description'] as String,
         createdAt: map['createdAt'] as String,
         status: map['status'] as String,
-        images: List.from(
-          (map['images'] as List),
-        ));
+        images: map['images'] as String);
   }
 
   String toJson() => json.encode(toMap());
@@ -99,7 +97,7 @@ class Complaint {
         other.description == description &&
         other.createdAt == createdAt &&
         other.status == status &&
-        listEquals(other.images, images);
+        other.images == images;
   }
 
   @override

@@ -4,33 +4,33 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 class Tenant {
-  String? id;
-  String? firstName;
-  String? lastName;
-  String? email;
-  String? phone;
-  String? address;
-  String? city;
-  String? state;
-  String? zip;
-  String? country;
-  String? createdAt;
-  List? transactions;
-  List? complaints;
+  final String id;
+  final String lastName;
+  final String firstName;
+  final String email;
+  final String phone;
+  final String address;
+  final String city;
+  final String state;
+  final String zip;
+  final String country;
+  final List transactions;
+  final List complaints;
+  final String flatId;
   Tenant({
-    this.id,
-    this.firstName,
-    this.lastName,
-    this.phone,
-    this.address,
-    this.email,
-    this.city,
-    this.state,
-    this.zip,
-    this.country,
-    this.createdAt,
-    this.transactions,
-    this.complaints,
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.phone,
+    required this.address,
+    required this.email,
+    required this.city,
+    required this.state,
+    required this.zip,
+    required this.country,
+    required this.transactions,
+    required this.complaints,
+    required this.flatId,
   });
 
   Tenant copyWith({
@@ -47,6 +47,7 @@ class Tenant {
     String? createdAt,
     List? transactions,
     List? complaints,
+    String? flatId,
   }) {
     return Tenant(
       id: id ?? this.id,
@@ -59,9 +60,9 @@ class Tenant {
       state: state ?? this.state,
       zip: zip ?? this.zip,
       country: country ?? this.country,
-      createdAt: createdAt ?? this.createdAt,
       transactions: transactions ?? this.transactions,
       complaints: complaints ?? this.complaints,
+      flatId: flatId ?? this.flatId,
     );
   }
 
@@ -77,7 +78,6 @@ class Tenant {
       'state': state,
       'zip': zip,
       'country': country,
-      'createdAt': createdAt,
       'transactions': transactions,
       'complaints': complaints,
     };
@@ -95,13 +95,13 @@ class Tenant {
         state: map['state'] as String,
         zip: map['zip'] as String,
         country: map['country'] as String,
-        createdAt: map['createdAt'] as String,
         transactions: List.from(
           (map['transactions'] as List),
         ),
         complaints: List.from(
           (map['complaints'] as List),
-        ));
+        ),
+        flatId: map['flatId'] as String);
   }
 
   String toJson() => json.encode(toMap());
@@ -111,7 +111,7 @@ class Tenant {
 
   @override
   String toString() {
-    return 'Tenant(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, address: $address, city: $city, state: $state, zip: $zip, country: $country, createdAt: $createdAt, transactions: $transactions, complaints: $complaints)';
+    return 'Tenant(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, address: $address, city: $city, state: $state, zip: $zip, country: $country, transactions: $transactions, complaints: $complaints)';
   }
 
   @override
@@ -128,7 +128,6 @@ class Tenant {
         other.state == state &&
         other.zip == zip &&
         other.country == country &&
-        other.createdAt == createdAt &&
         listEquals(other.transactions, transactions) &&
         listEquals(other.complaints, complaints);
   }
@@ -145,7 +144,6 @@ class Tenant {
         state.hashCode ^
         zip.hashCode ^
         country.hashCode ^
-        createdAt.hashCode ^
         transactions.hashCode ^
         complaints.hashCode;
   }

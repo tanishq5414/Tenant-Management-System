@@ -10,17 +10,28 @@ class TextController extends StatelessWidget {
   final String hint;
   final TextEditingController controller;
   final bool obsecureText;
+  final inputFormatters;
+  final keyboardType;
+  final maxlines;
+  final minlines;
   const TextController(
       {super.key,
       required this.hint,
       required this.controller,
-      this.obsecureText = false});
+      this.obsecureText = false,
+      this.inputFormatters,
+      this.maxlines = 1,
+      this.minlines = 1,
+      this.keyboardType});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      // keyboardType: TextInputType.none,
-      // inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      maxLines: maxlines,
+      minLines: minlines,
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      textCapitalization: TextCapitalization.sentences,
       controller: controller,
       obscureText: obsecureText,
       decoration: InputDecoration(

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 const Color appBackgroundColor = Color(0xfff7f7f7);
 const Color appWhiteColor = Color(0xfff7f7f7);
 const Color appBlackColor = Color(0xff000000);
-const Color appGreyColor = Color(0xffE5E5E5);
-const Color appOtherGreyColor = Color(0xffF5F5F5);
+const Color appGreyColor = Color.fromARGB(255, 214, 214, 214);
+const Color appDarkGreyColor = Color.fromARGB(255, 84, 84, 84);
+const Color appOtherGreyColor = Color.fromARGB(255, 220, 219, 219);
 const Color appAccentColor = Color(0xff551273);
 const MaterialColor primaryBlack = MaterialColor(
   _blackPrimaryValue,

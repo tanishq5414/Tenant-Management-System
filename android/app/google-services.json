@@ -7,18 +7,34 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:447838458565:android:1a08a3d9442cd7cbfd56ac",
+        "mobilesdk_app_id": "1:447838458565:android:cedf1b33a108e6aefd56ac",
         "android_client_info": {
-          "package_name": "com.example.tenantmgmnt"
+          "package_name": "com.snine.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "447838458565-b1n3hcb8p1hb0jjc7s8mla7t4oof1vna.apps.googleusercontent.com",
+          "client_id": "447838458565-apa726e1bohslfqja8dvd9dm2dsjhvhf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.tenantmgmnt",
-            "certificate_hash": "2024d710179fd605ed4791922cf59e387e3317e2"
+            "package_name": "com.snine.app",
+            "certificate_hash": "99dab543e2e6ed8361617ea04e1784ba49eba510"
+          }
+        },
+        {
+          "client_id": "447838458565-t4vmqk98sicm3ftnp9q26m856c8hgbs2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.snine.app",
+            "certificate_hash": "30a1d8a59995b5dce86c42d14705f1707be0fdf6"
+          }
+        },
+        {
+          "client_id": "447838458565-vb2ksij5qlsk2pj2gem8nkes25som5rq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.snine.app",
+            "certificate_hash": "63f99db9d8f6947b81c1533f2f8ff73a507ffeb6"
           }
         },
         {

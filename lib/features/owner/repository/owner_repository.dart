@@ -66,22 +66,20 @@ class OwnerRepository {
       propertyList: [],
       tenantList: [],
     );
-    var response = await _supabaseClient.from('owner').insert([
-      {
-        'id': user.uid,
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'phone': phone,
-        'address': '',
-        'city': '',
-        'state': '',
-        'zip': '',
-        'country': '',
-        'propertyList': [],
-      }
-    ]).execute();
-    if (response != null) {
+    var response = await _supabaseClient.rpc('insertownerdetails', params: {
+      'id': user.uid,
+      'firstname': firstName,
+      'lastname': lastName,
+      'email': email,
+      'phone': phone,
+      'address': ' ',
+      'city': ' ',
+      'state': ' ',
+      'zip': ' ',
+      'country': ' ',
+    }).execute();
+    print(response.data);
+    if (response.data != null) {
       return left(Failure(response.data));
     }
     return right(user1);
@@ -124,41 +122,104 @@ class OwnerRepository {
         .execute();
   }
 
-  FutureEither<List<Property>> getPropertyData(String uid) async {
+  Stream<List<Property>> getPropertyData(String uid) {
     //get full table from supabase
-    List<Property> propertyList = [];
-    print('tanishq');
-    var response = await _supabaseClient
+    return _supabaseClient
         .from('property')
-        .select()
+        .stream(primaryKey: ['id'])
         .eq('ownerId', uid)
+        .order('createdAt', ascending: false)
         .execute()
-        .then((value) {
-      print(value.data);
-      List data = value.data;
-      var n = data.length;
-      print(n);
-      for (int i = 0; i < n; i++) {
-        propertyList.add(Property(
-          id: value.data[i]['id'],
-          ownerId: value.data[i]['ownerId'],
-          name: value.data[i]['name'],
-          area: value.data[i]['area'],
-          city: value.data[i]['city'],
-          state: value.data[i]['state'],
-          flats: value.data[i]['flats']??[],
-          zip: value.data[i]['zip'],
-          tenants: value.data[i]['tenants'],
-          image: value.data[i]['image'],
-        ));
+        .map(
+          (maps) => maps
+              .map(
+                (map) => Property(
+                  id: map['id'],
+                  ownerId: map['ownerId'],
+                  name: map['name'],
+                  area: map['area'],
+                  city: map['city'],
+                  state: map['state'],
+                  zip: map['zip'],
+                  tenants: map['tenants'],
+                  image: map['image'],
+                  flats: map['flats'],
+                ),
+              )
+              .toList(),
+        );
+  }
+
+  // remove tenant
+  void removeTenant(
+    BuildContext context,
+    ownerid,
+    propertyid,
+    tenantid,
+    flatid,
+  ) async {
+    _supabaseClient.rpc('remove_tenant', params: {
+      'ownerid': ownerid,
+      'propertyid': propertyid,
+      'tenantid': tenantid,
+      'flatid': flatid,
+    }).then((value) {
+      if (value.error != null) {
+        print(value.error!.message);
+      } else {
+        print(value.data);
       }
     });
-    print('agarwal');
-    if (response != null) {
-      return left(Failure(response.data));
-    }
-    // print(propertyList);
-    return right(propertyList);
+  }
+
+  // add tenant
+  void addTenant(
+    BuildContext context,
+    ownerid,
+    propertyid,
+    tenantid,
+    flatid,
+  ) async {
+    _supabaseClient.rpc('add_tenant', params: {
+      'ownerid': ownerid,
+      'propertyid': propertyid,
+      'tenantid': tenantid,
+      'flatid': flatid,
+    }).then((value) {
+      if (value.error != null) {
+        print(value.error!.message);
+      } else {
+        print(value.data);
+      }
+    });
+  }
+
+  //get tenant data
+  Future<Tenant> getTenantData(String tenantid) async {
+    //get full table from supabase
+
+    var a = await _supabaseClient
+        .from('tenant')
+        .select()
+        .eq('id', tenantid)
+        .execute()
+        .then((value) => Tenant(
+              id: value.data[0]['id'],
+              firstName: value.data[0]['firstName'],
+              lastName: value.data[0]['lastName'],
+              email: value.data[0]['email'],
+              phone: value.data[0]['phone'],
+              address: value.data[0]['address'],
+              city: value.data[0]['city'],
+              state: value.data[0]['state'],
+              zip: value.data[0]['zip'],
+              country: value.data[0]['country'],
+              transactions: value.data[0]['transactions'],
+              complaints: value.data[0]['complaints'],
+              flatId: value.data[0]['flat_id'],
+            ));
+    print(a.runtimeType);
+    return a;
   }
 
   Stream<OwnerModal> getOwnerData(String uid) {
@@ -198,9 +259,10 @@ class OwnerRepository {
     List payments,
     List flatlist,
     String propertyid,
+    String ownerid,
   ) {
     var flatid = Uuid().v4();
-    flatlist.add(flatid);
+    print('flatid' + flatid);
     var response = _supabaseClient.from('flats').insert([
       {
         'id': flatid,
@@ -213,51 +275,69 @@ class OwnerRepository {
         'complaints': complaints,
         'payments': payments,
         'propertyId': propertyid,
+        'ownerId': ownerid,
       }
     ]).execute();
+    flatlist.add(flatid);
+    print('flatlist' + flatlist.toString());
 
     var response1 = _supabaseClient
         .from('property')
         .update({
           'flats': flatlist,
         })
-        .eq('id', 'propertyid')
+        .eq('id', propertyid)
         .execute();
   }
 
-  getFlatData(context, String propertyid) {
-    // Stream<List<FlatsModal>> flatlist = [];
+  FutureEither<FlatsModal> getSingleFlatData(String flatid) async {
+    var response1 =
+        await _supabaseClient.from('flats').select().eq('id', flatid).execute();
+    if (response1.data == null) {
+      return left(Failure(response1.data));
+    }
+    return right(FlatsModal(
+        id: response1.data.elementAt(0)['id'],
+        name: response1.data.elementAt(0)['name'],
+        description: response1.data.elementAt(0)['description'],
+        tenantId: response1.data.elementAt(0)['tenantId'],
+        rent: response1.data.elementAt(0)['rent'],
+        deposit: response1.data.elementAt(0)['deposit'],
+        due: response1.data.elementAt(0)['due'],
+        lastPaymentDate: response1.data.elementAt(0)['lastPaymentDate'],
+        complaints: response1.data.elementAt(0)['complaints'],
+        payments: response1.data.elementAt(0)['payments'],
+        propertyId: response1.data.elementAt(0)['propertyId'],
+        ownerId: response1.data.elementAt(0)['ownerId']));
+  }
 
-    var response1 = _supabaseClient
+  Future<List<FlatsModal>> getFlatData(String propertyid) async {
+    List<FlatsModal> flatlist = [];
+    var a = await _supabaseClient
         .from('flats')
-        .stream(primaryKey: ['id'])
-        .eq('id', propertyid)
-        .map(
-          (event) => event.map((e) => print(e)),
-        );
-    // var response = await _supabaseClient
-    //     .from('flats')
-    //     .select()
-    //     .eq('id', 'flatid')
-    //     .then((value) => {
-    //           for (var i = 0; i < value.data.length; i++)
-    //             {
-    //               flatlist.add(FlatsModal(
-    //                 id: value.data[i]['id'],
-    //                 name: value.data[i]['name'],
-    //                 description: value.data[i]['description'],
-    //                 TenantId: value.data[i]['tenantId'],
-    //                 Rent: value.data[i]['rent'],
-    //                 Deposit: value.data[i]['deposit'],
-    //                 Due: value.data[i]['due'],
-    //                 Complaints: value.data[i]['complaints'],
-    //                 Payments: value.data[i]['payments'],
-    //               ))
-    //             }
-    //         });
-    // if (response != null) {
-    //   return left(Failure(response.toString()));
-    // }
-    // return right(flatlist);
+        .select()
+        .eq('propertyId', propertyid)
+        .execute()
+        .then((value) => value.data);
+    for (var i = 0; i < a.length; i++) {
+      flatlist.add(
+        FlatsModal(
+          id: a.elementAt(i)['id'],
+          name: a.elementAt(i)['name'],
+          description: a.elementAt(i)['description'],
+          tenantId: a.elementAt(i)['tenantId'],
+          rent: a.elementAt(i)['rent'],
+          deposit: a.elementAt(i)['deposit'],
+          due: a.elementAt(i)['due'],
+          lastPaymentDate: a.elementAt(i)['lastPaymentDate'],
+          complaints: a.elementAt(i)['complaints'],
+          payments: a.elementAt(i)['payments'],
+          propertyId: a.elementAt(i)['propertyId'],
+          ownerId: a.elementAt(i)['ownerId'],
+        ),
+      );
+    }
+    print(flatlist);
+    return flatlist;
   }
 }

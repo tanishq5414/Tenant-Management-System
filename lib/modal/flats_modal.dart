@@ -7,45 +7,57 @@ class FlatsModal {
   final String id;
   final String name;
   final String description;
-  final String TenantId;
-  final String Rent;
-  final String Deposit;
-  final String Due;
-  final List Complaints;
-  final List Payments;
+  final String tenantId;
+  final String rent;
+  final String deposit;
+  final String due;
+  final List complaints;
+  final List payments;
+  final String propertyId;
+  final String ownerId;
+  final String lastPaymentDate;
   FlatsModal({
     required this.id,
     required this.name,
     required this.description,
-    required this.TenantId,
-    required this.Rent,
-    required this.Deposit,
-    required this.Due,
-    required this.Complaints,
-    required this.Payments,
+    required this.tenantId,
+    required this.rent,
+    required this.deposit,
+    required this.due,
+    required this.complaints,
+    required this.payments,
+    required this.propertyId,
+    required this.ownerId,
+    required this.lastPaymentDate,
   });
 
   FlatsModal copyWith({
     String? id,
     String? name,
     String? description,
-    String? TenantId,
-    String? Rent,
-    String? Deposit,
-    String? Due,
-    List? Complaints,
-    List? Payments,
+    String? tenantId,
+    String? rent,
+    String? deposit,
+    String? due,
+    List? complaints,
+    List? payments,
+    String? propertyId,
+    String? ownerId,
+    String? lastPaymentDate,
   }) {
     return FlatsModal(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
-      TenantId: TenantId ?? this.TenantId,
-      Rent: Rent ?? this.Rent,
-      Deposit: Deposit ?? this.Deposit,
-      Due: Due ?? this.Due,
-      Complaints: Complaints ?? this.Complaints,
-      Payments: Payments ?? this.Payments,
+      tenantId: tenantId ?? this.tenantId,
+      rent: rent ?? this.rent,
+      deposit: deposit ?? this.deposit,
+      due: due ?? this.due,
+      complaints: complaints ?? this.complaints,
+      payments: payments ?? this.payments,
+      propertyId: propertyId ?? this.propertyId,
+      ownerId: ownerId ?? this.ownerId,
+      lastPaymentDate: lastPaymentDate ?? this.lastPaymentDate,
     );
   }
 
@@ -54,12 +66,15 @@ class FlatsModal {
       'id': id,
       'name': name,
       'description': description,
-      'TenantId': TenantId,
-      'Rent': Rent,
-      'Deposit': Deposit,
-      'Due': Due,
-      'Complaints': Complaints,
-      'Payments': Payments,
+      'tenantId': tenantId,
+      'rent': rent,
+      'deposit': deposit,
+      'due': due,
+      'complaints': complaints,
+      'payments': payments,
+      'propertyId': propertyId,
+      'ownerId': ownerId,
+      'lastPaymentDate': lastPaymentDate,
     };
   }
 
@@ -68,13 +83,15 @@ class FlatsModal {
       id: map['id'] as String,
       name: map['name'] as String,
       description: map['description'] as String,
-      TenantId: map['TenantId'] as String,
-      Rent: map['Rent'] as String,
-      Deposit: map['Deposit'] as String,
-      Due: map['Due'] as String,
-      Complaints: List.from((map['Complaints'] as List),),
-      Payments: List.from((map['Payments'] as List),),
-    );
+      tenantId: map['tenantId'] as String,
+      rent: map['rent'] as String,
+      deposit: map['deposit'] as String,
+      due: map['due'] as String,
+      complaints: List.from((map['complaints'] as List)),
+      payments: List.from((map['payments'] as List)),
+      propertyId: map['propertyId'] as String,
+      ownerId: map['ownerId'] as String,
+      lastPaymentDate: map['lastPaymentDate'] as String);
   }
 
   String toJson() => json.encode(toMap());
@@ -83,7 +100,7 @@ class FlatsModal {
 
   @override
   String toString() {
-    return 'FlatsModal(id: $id, name: $name, description: $description, TenantId: $TenantId, Rent: $Rent, Deposit: $Deposit, Due: $Due, Complaints: $Complaints, Payments: $Payments)';
+    return 'FlatsModal(id: $id, name: $name, description: $description, tenantId: $tenantId, rent: $rent, deposit: $deposit, due: $due, complaints: $complaints, payments: $payments, propertyId: $propertyId, ownerId: $ownerId, lastPaymentDate: $lastPaymentDate)';
   }
 
   @override
@@ -94,12 +111,15 @@ class FlatsModal {
       other.id == id &&
       other.name == name &&
       other.description == description &&
-      other.TenantId == TenantId &&
-      other.Rent == Rent &&
-      other.Deposit == Deposit &&
-      other.Due == Due &&
-      listEquals(other.Complaints, Complaints) &&
-      listEquals(other.Payments, Payments);
+      other.tenantId == tenantId &&
+      other.rent == rent &&
+      other.deposit == deposit &&
+      other.due == due &&
+      listEquals(other.complaints, complaints) &&
+      listEquals(other.payments, payments) &&
+      other.propertyId == propertyId &&
+      other.ownerId == ownerId &&
+      other.lastPaymentDate == lastPaymentDate;
   }
 
   @override
@@ -107,11 +127,14 @@ class FlatsModal {
     return id.hashCode ^
       name.hashCode ^
       description.hashCode ^
-      TenantId.hashCode ^
-      Rent.hashCode ^
-      Deposit.hashCode ^
-      Due.hashCode ^
-      Complaints.hashCode ^
-      Payments.hashCode;
+      tenantId.hashCode ^
+      rent.hashCode ^
+      deposit.hashCode ^
+      due.hashCode ^
+      complaints.hashCode ^
+      payments.hashCode ^
+      propertyId.hashCode ^
+      ownerId.hashCode ^
+      lastPaymentDate.hashCode;
   }
 }

@@ -47,27 +47,37 @@ class _SignUpDataState extends ConsumerState<SignUpData> {
             SizedBox(
               height: size.height * 0.05,
             ),
-            Row(
-              children: [
-                SizedBox(
-                  width: size.width * 0.45,
-                  child: TextController(
-                      hint: 'First Name', controller: firstNameController),
-                ),
-                SizedBox(
-                  width: size.width * 0.45,
-                  child: TextController(
-                      hint: 'Last Name', controller: lastNameController),
-                ),
-              ],
+            Padding(
+              padding: EdgeInsets.only(
+                left: size.width * 0.05,
+                right: size.width * 0.1,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: size.width * 0.4,
+                    child: TextController(
+                        hint: 'First Name', controller: firstNameController),
+                  ),
+                  SizedBox(
+                    width: size.width * 0.4,
+                    child: TextController(
+                        hint: 'Last Name', controller: lastNameController),
+                  ),
+                ],
+              ),
             ),
             SizedBox(
               height: size.height * 0.01,
             ),
-            SizedBox(
-              width: size.width * 0.9,
-              child: TextController(
-                  hint: 'youremail@provider.com', controller: emailController),
+            Padding(
+              padding: EdgeInsets.fromLTRB(size.width * 0.05, 0, 0, 0),
+              child: SizedBox(
+                width: size.width * 0.85,
+                child: TextController(
+                    hint: 'youremail@provider.com', controller: emailController),
+              ),
             ),
             SizedBox(
               height: size.height * 0.01,
@@ -182,8 +192,9 @@ class _SignUpDataState extends ConsumerState<SignUpData> {
                               email: emailController.text,
                               phone: phonecontrller.text,
                               typeofuser: dropdownValue);
-                      Routemaster.of(context).push('/');
                     }
+                    Routemaster.of(context).push('/');
+
                   },
                 ),
               ),

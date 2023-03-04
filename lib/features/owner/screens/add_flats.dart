@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:selectable_container/selectable_container.dart';
 import 'package:tenantmgmnt/features/auth/components/main_button.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
+import 'package:tenantmgmnt/features/components/snack_bar.dart';
 import 'package:tenantmgmnt/features/components/text_controller.dart';
 import 'package:tenantmgmnt/features/components/custom_app_bar.dart';
 import 'package:tenantmgmnt/features/owner/controller/owner_controller.dart';
 
 class AddFlats extends ConsumerStatefulWidget {
   var propertyId;
-  List propertyList;
 
-  AddFlats({super.key, this.propertyId, required this.propertyList});
+  AddFlats({super.key, this.propertyId});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AddPropertyState();
@@ -50,7 +51,7 @@ class _AddPropertyState extends ConsumerState<AddFlats> {
             padding: EdgeInsets.only(
                 left: size.width * 0.05, right: size.width * 0.05),
             child: TextController(
-                hint: 'Flat Description', controller: flatdeposit),
+                hint: 'Flat Description', controller: flatdescription),
           ),
           SizedBox(
             height: size.height * 0.02,
@@ -58,7 +59,14 @@ class _AddPropertyState extends ConsumerState<AddFlats> {
           Padding(
             padding: EdgeInsets.only(
                 left: size.width * 0.05, right: size.width * 0.05),
-            child: TextController(hint: 'Flat Rent', controller: flatrent),
+            child: TextController(
+              hint: 'Flat Rent',
+              controller: flatrent,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+            ),
           ),
           SizedBox(
             height: size.height * 0.02,
@@ -68,7 +76,7 @@ class _AddPropertyState extends ConsumerState<AddFlats> {
                 left: size.width * 0.05, right: size.width * 0.05),
             child: SizedBox(
                 child: TextController(
-                    hint: 'Flat Deposit', controller: flatdescription)),
+                    hint: 'Flat Deposit', controller: flatdeposit, keyboardType: TextInputType.number, inputFormatters: [FilteringTextInputFormatter.digitsOnly],)),
           ),
           SizedBox(
             height: size.height * 0.05,
@@ -82,8 +90,13 @@ class _AddPropertyState extends ConsumerState<AddFlats> {
               child: MainButton(
                 text: 'Add Flat',
                 onPressed: () {
+                  if(flatname.text.isEmpty || flatdescription.text.isEmpty || flatrent.text.isEmpty || flatdeposit.text.isEmpty){
+                    Utils.showSnackBar('Please fill all the fields');
+                    return;
+                  }
                   ref.read(ownerControllerProvider.notifier).addFlat(
                       context: context,
+                      ownerid: user.id!,
                       flatname: flatname.text,
                       description: flatdescription.text,
                       tenantid: '',
@@ -95,8 +108,7 @@ class _AddPropertyState extends ConsumerState<AddFlats> {
                       flatlist: [],
                       propertyid: widget.propertyId);
 
-                  Routemaster.of(context).popUntil((routeData) => false);
-                  Routemaster.of(context).push('/propertyhome');
+                  Routemaster.of(context).history.back();
                 },
               ),
             ),

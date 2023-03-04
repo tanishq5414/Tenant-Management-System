@@ -6,11 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/auth/repository/auth_methods.dart';
+import 'package:tenantmgmnt/features/tenant/controller/tenant_controller.dart';
 import 'package:tenantmgmnt/modal/owner_modal.dart';
 import 'package:tenantmgmnt/modal/property_modal.dart';
+import 'package:tenantmgmnt/modal/user_type_modal.dart';
 import '../../components/snack_bar.dart';
+import '../../owner/controller/owner_controller.dart';
 
-
+final userTypeProvider = StateProvider<UserType?>((ref) => null);
 final authControllerProvider = StateNotifierProvider<AuthController, bool>(
   (ref) => AuthController(
     authRepository: ref.watch(authRepositoryProvider),
@@ -21,9 +24,9 @@ final authStateProvider = StreamProvider((ref) {
   final authController = ref.watch(authControllerProvider.notifier);
   return authController.authStateChange;
 });
-final getOwnerDataProvider = StreamProvider.family((ref, String uid) {
-  final authController = ref.watch(authControllerProvider.notifier);
-  return authController.getOwnerData(uid);
+final getUserTypeProvider = StreamProvider.family((ref, String uid) {
+  final ownerController = ref.watch(authControllerProvider.notifier);
+  return ownerController.tenantorowner(uid);
 });
 
 class AuthController extends StateNotifier<bool> {
@@ -33,10 +36,6 @@ class AuthController extends StateNotifier<bool> {
       : _authRepository = authRepository,
         _ref = ref,
         super(false);
-  Stream<OwnerModal> getOwnerData(String uid) {
-    return _authRepository.getOwnerData(uid);
-  }
-
   Stream<User?> get authStateChange => _authRepository.authStateChange;
   void PhoneSignIn(BuildContext context, String phoneNumber) async {
     if (phoneNumber.length != 10)
@@ -45,11 +44,7 @@ class AuthController extends StateNotifier<bool> {
     phoneNumber = '+91' + phoneNumber;
     state = true;
     final user = await _authRepository.phoneSignIn(context, phoneNumber);
-
     state = false;
-    // user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
-    //   _ref.read(userProvider.notifier).update((state) => userModel);
-    // });
   }
 
   void insertTenantFirstDetails({
@@ -64,99 +59,17 @@ class AuthController extends StateNotifier<bool> {
         context, firstName, lastName, email, phone, typeofuser);
   }
 
-  // void insertOwnerFirstDetails({
-  //   required BuildContext context,
-  //   required String firstName,
-  //   required String lastName,
-  //   required String email,
-  //   required String phone,
-  //   required String typeofuser,
-  // }) async {
-  //   final user = await _authRepository.insertOwnerFirstDetails(
-  //       context, firstName, lastName, email, phone, typeofuser);
-  //   user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
-  //     _ref.read(ownerDataProvider.notifier).update((state) => userModel);
-  //   });
-  //   Routemaster.of(context).popUntil((routeData) => false);
-  // }
-
-  // void addProperty({
-  //   required BuildContext context,
-  //   required List userpropertylist,
-  //   required String propertyname,
-  //   required String propertyarea,
-  //   required String propertycity,
-  //   required String propertystate,
-  //   required String propertyzipcode,
-  //   required String propertyimage,
-  // }) {
-  //   final user = _authRepository.addProperty(context, userpropertylist,
-  //       propertyname, propertyarea,propertycity, propertystate, propertyzipcode, propertyimage);
-  // }
-
-  // Future<List<Property>> getPropertyData(String uid) async {
-  //   // late List<Property> u = [];
-  //   var u;
-  //   final user = await _authRepository.getPropertyData(uid);
-  //   user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
-  //     u = userModel;
-  //   });
-  //   return u;
-  //   // return u;
-  // }
-  // Stream<User?> get authStateChange => _authRepository.authStateChange;
-  // void signInWithGoogle(BuildContext context) async {
-  //   state = true;
-  //   final user = await _authRepository.signInWithGoogle(context);
-  //   state = false;
-  //   user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
-  //     _ref.read(userProvider.notifier).update((state) => userModel);
-  //   });
-  // }
-
-  // void bookmarkNotes(BuildContext context, String id, bookmarks) {
-  //   final user = _authRepository.bookmarkNotes(id, bookmarks);
-  // }
-
-  // void updateUserCourses(BuildContext context, String uid, var cid) {
-  //   final user = _authRepository.updateUserCourses(uid, cid);
-  // }
-  // void incrementNotesOpened(BuildContext context, String uid , String notesid, String notesname, String course, String unit) {
-  //   final user = _authRepository.incrementnotesopened(uid , notesid, notesname, course , unit);
-  // }
-
-  // void logInWithEmail(
-  //     BuildContext context, String email, String password) async {
-  //   state = true;
-  //   final user = await _authRepository.loginWithEmail(
-  //       email: email, password: password, context: context);
-  //   state = false;
-  //   user.fold((l) => Utils.showSnackBar(l.message), (r) => _ref.read(userProvider.notifier).update((state) => r));
-
-  // }
-
-  // void sendEmailVerification(BuildContext context) async {
-  //   final user = _authRepository.sendEmailVerification(context);
-  // }
-
-  // void signUpwithEmail(BuildContext context, email, password, fullName) async {
-  //   final user = _authRepository.signUpWithEmail(
-  //       email: email, password: password, fullName: fullName, context: context);
-  // }
-
-  void signOut(BuildContext context) async {
-    final user = _authRepository.signOut();
+  Stream<UserType> tenantorowner(uid) {
+    return _authRepository.tenantorowner(uid);
   }
 
-  // void updateName(BuildContext context, fullName, uid) async {
-  //   final user = _authRepository.updateName(context, fullName, uid);
-  // }
-
-  // void deleteAccount(BuildContext context) async {
-  //   final user = _authRepository.deleteAccount(context);
-  // }
-
-  // void resetPassword(BuildContext context, email) async {
-  //   final user = _authRepository.resetPassword(email: email);
-  // }
+  void signOut(BuildContext context) async {
+    _ref.read(userTypeProvider.notifier).state = null;
+    _ref.read(tenantDataProvider.notifier).state = null;
+    _ref.read(ownerDataProvider.notifier).state = null;
+    _ref.read(propertyDataProvider.notifier).state = null;
+    _ref.read(flatDataProvider.notifier).state = null;
+    _ref.read(complaintDataProvider.notifier).state = null;
+    final user = _authRepository.signOut();
+  }
 }

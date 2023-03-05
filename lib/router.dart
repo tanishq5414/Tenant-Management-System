@@ -10,6 +10,7 @@ import 'package:tenantmgmnt/features/owner/screens/add_property.dart';
 import 'package:tenantmgmnt/features/owner/screens/owner_home.dart';
 import 'package:tenantmgmnt/features/owner/screens/properties_home.dart';
 import 'package:tenantmgmnt/features/owner/screens/property_details.dart';
+import 'package:tenantmgmnt/features/owner/screens/tenants_screens.dart';
 import 'package:tenantmgmnt/features/tenant/screens/add_complaint.dart';
 import 'package:tenantmgmnt/features/tenant/screens/complaint_details.dart';
 import 'package:tenantmgmnt/features/tenant/screens/tenant_home.dart';
@@ -30,6 +31,7 @@ final loggedinpages = RouteMap(routes: {
   '/addcomplaint': (_) => MaterialPage(child: AddComplaints()),
   '/complaintshome': (_) => MaterialPage(child: ComplaintsHome()),
   '/complaintdetails': (q) => MaterialPage( child: ComplaintDetails()),
+  '/ownertenantdetails': (_) => MaterialPage(child: OwnertenantScreen()),
   '/propertydetails': (q) => MaterialPage(
           child: PropertyDetails(
         propertyId: q.queryParameters['propertyId']!,

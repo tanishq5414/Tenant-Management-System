@@ -20,8 +20,10 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
   @override
   UserType? user;
   var flag = -1;
+  @override
   Widget build(BuildContext context) {
-    loading() async {
+
+    loading()async{
       user = ref.watch(userTypeProvider);
       if (user != null) {
         if (user!.user_type == 'tenant') {
@@ -62,10 +64,19 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
               .getPropertyData(user!.id)
               .first;
           ref.read(propertyDataProvider.notifier).update((state) => u1);
+          var u2 = await ref
+              .read(ownerControllerProvider.notifier)
+              .getComplaintData(user!.id)
+              .first;
+          ref.read(complaintDataProviderOwner.notifier).update((state) => u2);
+          var u3 = await ref
+              .read(ownerControllerProvider.notifier)
+              .getAllFlatsData(user!.id)
+              .first;
+          ref.read(allflatsDataProviderOwner.notifier).update((state) => u3);
         }
       }
     }
-
     loading();
     if (flag == 0) {
       print('owner screen returned');
@@ -80,6 +91,7 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
         child: Scaffold(
           body: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: const [
                 Center(
                   child: CircularProgressIndicator(),

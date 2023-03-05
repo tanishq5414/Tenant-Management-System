@@ -38,7 +38,8 @@ class _TenantHomeState extends ConsumerState<TenantHome> {
           lastPaymentDate: '',
         );
 
-    return (tenantData!=null)?Container(
+    return (tenantData != null)
+        ? Container(
             color: appBackgroundColor,
             child: SafeArea(
               child: Scaffold(
@@ -150,13 +151,15 @@ class _TenantHomeState extends ConsumerState<TenantHome> {
                             const Spacer(),
                           ],
                         ),
+                        
                       ],
                     ),
                   ),
                 ),
               ),
             ),
-          ): const Scaffold(
+          )
+        : const Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
             ),

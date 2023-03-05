@@ -180,6 +180,10 @@ class AuthRepository {
       country: '',
       propertyList: [],
       tenantList: [],
+      flatList: [],
+      complaintList: [],
+      rentDue: '',
+      rentRecieved: '',
     );
     // var response = await _supabaseClient.from('owner').insert([
     //   {

@@ -10,10 +10,15 @@ import 'package:tenantmgmnt/modal/flats_modal.dart';
 import 'package:tenantmgmnt/modal/owner_modal.dart';
 import 'package:tenantmgmnt/modal/property_modal.dart';
 import 'package:tenantmgmnt/modal/tenant_modal.dart';
+import '../../../modal/complaints_modal.dart';
 import '../../components/snack_bar.dart';
 
 final ownerDataProvider = StateProvider<OwnerModal?>((ref) => null);
 final propertyDataProvider = StateProvider<List<Property>?>((ref) => null);
+final complaintDataProviderOwner =
+    StateProvider<List<Complaint>?>((ref) => null);
+final allflatsDataProviderOwner =
+    StateProvider<List<FlatsModal>?>((ref) => null);
 
 final ownerControllerProvider = StateNotifierProvider<OwnerController, bool>(
   (ref) => OwnerController(
@@ -32,6 +37,16 @@ final getPropertyDataProvider = StreamProvider.family((ref, String uid) {
   return ownerController.getPropertyData(uid);
 });
 
+final getComplaintDataProvider = StreamProvider.family((ref, String fid) {
+  final ownerController = ref.watch(ownerControllerProvider.notifier);
+  return ownerController.getComplaintData(fid);
+});
+
+final getAllFlatDataProvider = FutureProvider.family((ref, String ownerid) {
+  final ownerController = ref.watch(ownerControllerProvider.notifier);
+  return ownerController.getAllFlatsData(ownerid);
+});
+
 class OwnerController extends StateNotifier<bool> {
   final OwnerRepository _ownerRepository;
   final Ref _ref;
@@ -48,16 +63,27 @@ class OwnerController extends StateNotifier<bool> {
     return _ownerRepository.getPropertyData(uid);
   }
 
+  Stream<List<Complaint>> getComplaintData(String fid) {
+    return _ownerRepository.getComplaintsData(fid);
+  }
+
+  Stream<List<FlatsModal>> getAllFlatsData(String fid) {
+    return _ownerRepository.getAllFlatsData(fid);
+  }
+
   Future<FlatsModal> getSingleFlatData(String fid) async {
     var FlatsData1;
+    print(fid);
     var a = await _ownerRepository.getSingleFlatData(fid);
     a.fold((l) => Utils.showSnackBar(l.message), (FlatsData) {
-      FlatsData1 = FlatsData;
+      print(FlatsData);
+      return FlatsData;
     });
+    print(FlatsData1);
     return FlatsData1;
   }
 
-  Future<List<dynamic>> getFlatData(pid){
+  Future<List<dynamic>> getFlatData(pid) {
     print("getFlatData");
     var a = _ownerRepository.getFlatData(pid);
     return a;

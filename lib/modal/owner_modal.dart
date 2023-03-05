@@ -16,6 +16,10 @@ class OwnerModal {
   final String? id;
   final List? propertyList;
   final List? tenantList;
+  final List? flatList;
+  final List? complaintList;
+  final String? rentDue;
+  final String? rentRecieved;
   OwnerModal({
     required this.firstName,
     required this.lastName,
@@ -29,6 +33,10 @@ class OwnerModal {
     required this.id,
     required this.propertyList,
     required this.tenantList,
+    required this.flatList,
+    required this.complaintList,
+    required this.rentDue,
+    required this.rentRecieved,
   });
 
   OwnerModal copyWith({
@@ -45,7 +53,10 @@ class OwnerModal {
     String? createdAt,
     List? propertyList,
     List? tenantList,
-
+    List? flatList,
+    List? complaintList,
+    String? rentDue,
+    String? rentRecieved,
   }) {
     return OwnerModal(
       firstName: firstName ?? this.firstName,
@@ -60,6 +71,10 @@ class OwnerModal {
       id: id ?? this.id,
       propertyList: propertyList ?? this.propertyList,
       tenantList: tenantList ?? this.tenantList,
+      flatList: flatList ?? this.flatList,
+      complaintList: complaintList ?? this.complaintList,
+      rentDue: rentDue ?? this.rentDue,
+      rentRecieved: rentRecieved ?? this.rentRecieved,
     );
   }
 
@@ -77,7 +92,10 @@ class OwnerModal {
       'id': id,
       'propertyList': propertyList,
       'tenantList': tenantList,
-
+      'flatList': flatList,
+      'complaintList': complaintList,
+      'rentDue': rentDue,
+      'rentRecieved': rentRecieved,
     };
   }
 
@@ -93,12 +111,21 @@ class OwnerModal {
         zip: map['zip'] as String,
         country: map['country'] as String,
         id: map['id'] as String,
+        flatList: List.from(
+          (map['flatList'] as List),
+        ),
+        complaintList: List.from(
+          (map['complaintList'] as List),
+        ),
+        rentDue: map['rentDue'] as String,
+        rentRecieved: map['rentRecieved'] as String,
         propertyList: List.from(
           (map['propertyList'] as List),
         ),
         tenantList: List.from(
           (map['tenantList'] as List),
         ));
+
   }
 
   String toJson() => json.encode(toMap());

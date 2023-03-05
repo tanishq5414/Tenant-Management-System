@@ -21,6 +21,8 @@ import 'package:tenantmgmnt/modal/property_modal.dart';
 import 'package:tenantmgmnt/modal/tenant_modal.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../modal/complaints_modal.dart';
+
 final ownerRepositoryProvider = Provider(
   (ref) => OwnerRepository(
     supabaseClient: ref.read(supabaseProvider),
@@ -65,6 +67,10 @@ class OwnerRepository {
       country: '',
       propertyList: [],
       tenantList: [],
+      flatList: [],
+      complaintList: [],
+      rentDue: '',
+      rentRecieved: '',
     );
     var response = await _supabaseClient.rpc('insertownerdetails', params: {
       'id': user.uid,
@@ -222,6 +228,34 @@ class OwnerRepository {
     return a;
   }
 
+  Stream<List<Complaint>> getComplaintsData(String uid) {
+    //get full table from supabase
+    return _supabaseClient
+        .from('complaints')
+        .stream(primaryKey: ['id'])
+        .eq('ownerId', uid)
+        .order('createdAt', ascending: false)
+        .limit(10)
+        .execute()
+        .map(
+          (maps) => maps
+              .map(
+                (map) => Complaint(
+                  id: map['id'],
+                  ownerId: map['ownerId'],
+                  subject: map['subject'],
+                  images: map['images'] ?? '',
+                  flatId: map['flatId'],
+                  tenantId: map['tenantId'],
+                  description: map['description'],
+                  status: map['status'],
+                  createdAt: map['createdAt'],
+                ),
+              )
+              .toList(),
+        );
+  }
+
   Stream<OwnerModal> getOwnerData(String uid) {
     Stream<OwnerModal> user;
     user = _supabaseClient
@@ -241,6 +275,10 @@ class OwnerRepository {
               zip: event.elementAt(0)['pincode'],
               country: event.elementAt(0)['country'],
               propertyList: event.elementAt(0)['propertyList'],
+              flatList: event.elementAt(0)['flatList'],
+              complaintList: event.elementAt(0)['complaintList'],
+              rentDue: event.elementAt(0)['rentDue'],
+              rentRecieved: event.elementAt(0)['rentRecieved'],
               tenantList: event.elementAt(0)['tenantList']);
         });
     return user;
@@ -296,7 +334,8 @@ class OwnerRepository {
     if (response1.data == null) {
       return left(Failure(response1.data));
     }
-    return right(FlatsModal(
+    return right(
+      FlatsModal(
         id: response1.data.elementAt(0)['id'],
         name: response1.data.elementAt(0)['name'],
         description: response1.data.elementAt(0)['description'],
@@ -308,7 +347,9 @@ class OwnerRepository {
         complaints: response1.data.elementAt(0)['complaints'],
         payments: response1.data.elementAt(0)['payments'],
         propertyId: response1.data.elementAt(0)['propertyId'],
-        ownerId: response1.data.elementAt(0)['ownerId']));
+        ownerId: response1.data.elementAt(0)['ownerId'],
+      ),
+    );
   }
 
   Future<List<FlatsModal>> getFlatData(String propertyid) async {
@@ -339,5 +380,34 @@ class OwnerRepository {
     }
     print(flatlist);
     return flatlist;
+  }
+
+  Stream<List<FlatsModal>> getAllFlatsData(String ownerid) {
+    //get full table from supabase
+    return _supabaseClient
+        .from('flats')
+        .stream(primaryKey: ['id'])
+        .eq('ownerId', ownerid)
+        .execute()
+        .map(
+          (maps) => maps
+              .map(
+                (map) => FlatsModal(
+                  id: map['id'],
+                  name: map['name'],
+                  description: map['description'],
+                  tenantId: map['tenantId'] ?? "",
+                  rent: map['rent'],
+                  deposit: map['deposit'],
+                  due: map['due'] ?? "",
+                  lastPaymentDate: map['lastPaymentDate'] ?? "",
+                  complaints: map['complaints'],
+                  payments: map['payments'],
+                  propertyId: map['propertyId'],
+                  ownerId: map['ownerId'],
+                ),
+              )
+              .toList(),
+        );
   }
 }

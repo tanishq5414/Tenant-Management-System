@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_octicons/flutter_octicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
 import 'package:tenantmgmnt/features/components/custom_app_bar.dart';
 import 'package:tenantmgmnt/features/owner/controller/owner_controller.dart';
-import 'package:tenantmgmnt/modal/owner_modal.dart';
 import 'package:tenantmgmnt/themes/colors.dart';
 
 class OwnerHomeScreen extends ConsumerStatefulWidget {
@@ -18,20 +16,15 @@ class OwnerHomeScreen extends ConsumerStatefulWidget {
 
 class _OwnerHomeScreenState extends ConsumerState<OwnerHomeScreen> {
   bool ciruclar = true;
-  var user;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    var user;
-    getdata() async {
-      user = ref.watch(ownerDataProvider);
-    }
-    getdata();
-    // var a = ref.read(ownerControllerProvider.notifier).listentopropertydata(user.id);
+    var user = ref.watch(ownerDataProvider);
+    var complaints = ref.watch(complaintDataProviderOwner)??[];
     return (user != null)
         ? Container(
-          color: appBackgroundColor,
-          child: SafeArea(
+            color: appBackgroundColor,
+            child: SafeArea(
               child: Scaffold(
                 backgroundColor: appBackgroundColor,
                 appBar: CustomAppBar(
@@ -87,7 +80,7 @@ class _OwnerHomeScreenState extends ConsumerState<OwnerHomeScreen> {
                                     ),
                                     child: Center(
                                       child: Text(
-                                        user.propertyList?.length?.toString() ??
+                                        user.propertyList?.length.toString() ??
                                             '0',
                                         style: const TextStyle(
                                             color: Colors.black,
@@ -106,9 +99,8 @@ class _OwnerHomeScreenState extends ConsumerState<OwnerHomeScreen> {
                           // Spacer(),
                           InkWell(
                             onTap: () {
-                              ref
-                                  .read(authControllerProvider.notifier)
-                                  .signOut(context);
+                              Routemaster.of(context)
+                                  .push('/ownertenantdetails');
                             },
                             child: Container(
                               height: size.height * 0.1,
@@ -142,7 +134,8 @@ class _OwnerHomeScreenState extends ConsumerState<OwnerHomeScreen> {
                                     ),
                                     child: Center(
                                       child: Text(
-                                        user.tenantList?.length.toString() ?? '0',
+                                        user.tenantList?.length.toString() ??
+                                            '0',
                                         style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
@@ -206,9 +199,9 @@ class _OwnerHomeScreenState extends ConsumerState<OwnerHomeScreen> {
                                   SizedBox(
                                     height: size.height * 0.01,
                                   ),
-                                  const Text(
-                                    'Rs. 99,99,99,999',
-                                    style: TextStyle(
+                                  Text(
+                                    user.rentDue.toString(),
+                                    style: const TextStyle(
                                         overflow: TextOverflow.visible,
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
@@ -254,9 +247,9 @@ class _OwnerHomeScreenState extends ConsumerState<OwnerHomeScreen> {
                                   SizedBox(
                                     height: size.height * 0.01,
                                   ),
-                                  const Text(
-                                    'Rs. 99,99,99,999',
-                                    style: TextStyle(
+                                  Text(
+                                    user.rentDue.toString(),
+                                    style: const TextStyle(
                                         overflow: TextOverflow.visible,
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
@@ -273,15 +266,170 @@ class _OwnerHomeScreenState extends ConsumerState<OwnerHomeScreen> {
                     SizedBox(
                       height: size.height * 0.025,
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: size.width * 0.04,
+                          right: size.width * 0.04,
+                          bottom: size.width * 0.03),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Complaints',
+                            style: TextStyle(
+                                overflow: TextOverflow.visible,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15),
+                          ),
+                          InkWell(
+                            onTap: () =>
+                                Routemaster.of(context).push('/complaints'),
+                            child: const Text(
+                              'View All',
+                              style: TextStyle(
+                                  overflow: TextOverflow.visible,
+                                  color: appAccentColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                     Container(
-                      height: size.height * 0.2,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(size.width * 0.05, 0,
+                            size.width * 0.05, size.width * 0.02),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: size.width * 0.005,
+                              ),
+                              SizedBox(
+                                width: size.width * 0.27,
+                                child: const Text(
+                                  'Subject',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: appBlackColor,
+                                      fontSize: 13),
+                                ),
+                              ),
+                              SizedBox(
+                                width: size.width * 0.43,
+                                child: const Text(
+                                  'Description',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: appBlackColor,
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: 13),
+                                ),
+                              ),
+                              Container(
+                                width: size.width * 0.1,
+                                child: const Text(
+                                  'Status',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: appBlackColor,
+                                      fontSize: 13),
+                                ),
+                              ),
+                            ]),
+                      ),
                     ),
                     //create a listview.builder where complaints are displayed
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          size.width * 0.05, 0, size.width * 0.05, 0),
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: complaints.length,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {
+                                Routemaster.of(context).push(
+                                  '/complaintdetails',
+                                  queryParameters: {
+                                    'complaintId': complaints[index].id,
+                                    'subject': complaints[index].subject,
+                                    'description':
+                                        complaints[index].description,
+                                    'status': complaints[index].status,
+                                    'createdAt':
+                                        complaints[index].createdAt.toString(),
+                                  },
+                                );
+                              },
+                              child: Container(
+                                height: size.width * 0.1,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  // borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 1,
+                                      blurRadius: 7,
+                                      // offset: const Offset(0, 3), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: size.width * 0.005,
+                                      ),
+                                      Container(
+                                        width: size.width * 0.27,
+                                        child: Text(
+                                          complaints[index].subject,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: appBlackColor,
+                                              fontSize: 10),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: size.width * 0.43,
+                                        child: Text(
+                                          complaints[index].description,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: appBlackColor,
+                                              overflow: TextOverflow.ellipsis,
+                                              fontSize: 10),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: size.width * 0.1,
+                                        child: Text(
+                                          complaints[index].status,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: appBlackColor,
+                                              fontSize: 10),
+                                        ),
+                                      ),
+                                    ]),
+                              ),
+                            );
+                          }),
+                    ),
                   ],
                 ),
               ),
             ),
-        )
-        : const Center(child: CircularProgressIndicator());
+          )
+        : const Scaffold(
+            backgroundColor: appBackgroundColor,
+            body: Center(child: CircularProgressIndicator()),
+          );
   }
 }

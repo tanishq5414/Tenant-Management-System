@@ -14,9 +14,11 @@ class TextController extends StatelessWidget {
   final keyboardType;
   final maxlines;
   final minlines;
-  const TextController(
+  bool autofocus;
+  TextController(
       {super.key,
       required this.hint,
+      this.autofocus = false,
       required this.controller,
       this.obsecureText = false,
       this.inputFormatters,
@@ -28,6 +30,7 @@ class TextController extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       maxLines: maxlines,
+      autofocus: autofocus,
       minLines: minlines,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,

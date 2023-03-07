@@ -19,7 +19,9 @@ import 'package:tenantmgmnt/modal/owner_modal.dart';
 import 'package:tenantmgmnt/modal/property_modal.dart';
 import 'package:tenantmgmnt/modal/tenant_modal.dart';
 import 'package:tenantmgmnt/modal/user_type_modal.dart';
+import 'package:tenantmgmnt/themes/colors.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
 final authRepositoryProvider = Provider(
   (ref) => AuthRepository(
@@ -48,65 +50,73 @@ class AuthRepository {
     String phoneNumber,
   ) async {
     TextEditingController codeController = TextEditingController();
-    if (kIsWeb) {
-      // !!! Works only on web !!!
-      ConfirmationResult result =
-          await _auth.signInWithPhoneNumber(phoneNumber);
-      void onPressed() async {
-        PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: result.verificationId,
-          smsCode: codeController.text.trim(),
-        );
+    // FOR ANDROID, IOS
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      //  Automatic handling of the SMS code
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // !!! works only on android !!!
         await _auth.signInWithCredential(credential);
-        Routemaster.of(context).pop(); // Remove the dialog box
-      }
-
-      Routemaster.of(context).push(
-          '/otpscreen/?codecontroller=$codeController&onPressed=$onPressed()');
-    } else {
-      // FOR ANDROID, IOS
-      await _auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        //  Automatic handling of the SMS code
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // !!! works only on android !!!
-          await _auth.signInWithCredential(credential);
-        },
-        // Displays a message when verification fails
-        verificationFailed: (e) {
-          Utils.showSnackBar(e.message!);
-        },
-        // Displays a dialog box when OTP is sent
-        codeSent: ((String verificationId, int? resendToken) async {
-          showOTPDialog(
-              codeController: codeController,
-              context: context,
-              onPressed: () async {
-                PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                  verificationId: verificationId,
-                  smsCode: codeController.text.trim(),
-                );
-
-                // !!! Works only on Android, iOS !!!
-                var usercredential =
-                    await _auth.signInWithCredential(credential);
-                Routemaster.of(context).pop(); // Remove the dialog box
-                if (usercredential.additionalUserInfo!.isNewUser) {
-                  Routemaster.of(context).push('/signupdata');
-                } else {
-                  Routemaster.of(context).push('/');
-                }
-              });
-        }),
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Auto-resolution timed out...
-        },
-      );
-    }
+      },
+      // Displays a message when verification fails
+      verificationFailed: (e) {
+        Utils.showSnackBar(e.message!);
+      },
+      // Displays a dialog box when OTP is sent
+      codeSent: ((String verificationId, int? resendToken) async {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            insetPadding: EdgeInsets.zero,
+            elevation: 0,
+            title: const Text("Enter OTP"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                OtpTextField(
+                  numberOfFields: 6,
+                  borderColor: appAccentColor,
+                  //set to true to show as box or false to show as dash
+                  showFieldAsBox: true,
+                  //runs when a code is typed in
+                  onCodeChanged: (String code) {
+                  },
+                  //runs when every textfield is filled
+                  onSubmit: (String verificationCode) async {
+                    try{
+                    PhoneAuthCredential credential =
+                        PhoneAuthProvider.credential(
+                      verificationId: verificationId,
+                      smsCode: verificationCode,
+                    );
+                    var usercredential =
+                        await _auth.signInWithCredential(credential);
+                    Routemaster.of(context).pop(); // Remove the dialog box
+                    if (usercredential.additionalUserInfo!.isNewUser) {
+                      Routemaster.of(context).push('/signupdata');
+                    } else {
+                      Routemaster.of(context).push('/');
+                    }
+                    }catch(e){
+                      Utils.showSnackBar('Invalid OTP');
+                    }
+                  }, 
+                  // end onSubmit
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
+      codeAutoRetrievalTimeout: (String verificationId) {
+        // Auto-resolution timed out...
+      },
+    );
   }
 
   //tenant or owner sign up
-Future<UserType> tenantorowner(uid) async {
+  Future<UserType> tenantorowner(uid) async {
     var response = await _supabaseClient
         .from('user_details')
         .select()

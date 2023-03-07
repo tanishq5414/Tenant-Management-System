@@ -98,9 +98,11 @@ class _LoadingPageState extends ConsumerState<LoadingPage> {
   }
 
   Widget build(BuildContext context) {
-    var user = ref.watch(userTypeProvider)!;
-    loading(user);
-    if (user.user_type == 'tenant') {
+    var user = ref.watch(userTypeProvider);
+    (user== null) ?Loader():{
+    loading(user)
+    };
+    if (user!.user_type == 'tenant') {
       return const TenantHome();
     } else {
       return const OwnerHomeScreen();

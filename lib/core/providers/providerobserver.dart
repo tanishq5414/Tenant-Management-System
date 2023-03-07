@@ -9,12 +9,12 @@ class Logger extends ProviderObserver {
     Object? newValue,
     ProviderContainer container,
   ) {
-    if (kDebugMode) {
-      print('''
-{
-  "provider": "${provider.name ?? provider.runtimeType}",
-  "newValue": "$newValue"
-}''');
-    }
+//     if (kDebugMode) {
+//       print('''
+// {
+//   "provider": "${provider.name ?? provider.runtimeType}",
+//   "newValue": "$newValue"
+// }''');
+//     }
   }
 }

@@ -9,6 +9,7 @@ import 'package:tenantmgmnt/features/components/snack_bar.dart';
 import 'package:tenantmgmnt/features/components/text_controller.dart';
 import 'package:tenantmgmnt/features/components/custom_app_bar.dart';
 import 'package:tenantmgmnt/features/owner/controller/owner_controller.dart';
+import 'package:tenantmgmnt/modal/property_modal.dart';
 
 class AddFlats extends ConsumerStatefulWidget {
   var propertyId;
@@ -28,6 +29,9 @@ class _AddPropertyState extends ConsumerState<AddFlats> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final user = ref.watch(ownerDataProvider)!;
+    final property = ref.watch(propertyDataProvider)!;
+    int propertyIndex = property.indexWhere((element) => element.id == widget.propertyId);
+    final Property propertyData = property[propertyIndex];
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
@@ -105,7 +109,7 @@ class _AddPropertyState extends ConsumerState<AddFlats> {
                       due: '',
                       complaint: [],
                       payments: [],
-                      flatlist: [],
+                      flatlist: propertyData.flats,
                       propertyid: widget.propertyId);
 
                   Routemaster.of(context).history.back();

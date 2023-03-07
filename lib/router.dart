@@ -7,6 +7,7 @@ import 'package:tenantmgmnt/features/auth/signup/signupdata.dart';
 import 'package:tenantmgmnt/features/home/loading_providers.dart';
 import 'package:tenantmgmnt/features/owner/screens/add_flats.dart';
 import 'package:tenantmgmnt/features/owner/screens/add_property.dart';
+import 'package:tenantmgmnt/features/owner/screens/contact_picker.dart';
 import 'package:tenantmgmnt/features/owner/screens/owner_home.dart';
 import 'package:tenantmgmnt/features/owner/screens/properties_home.dart';
 import 'package:tenantmgmnt/features/owner/screens/property_details.dart';
@@ -30,7 +31,8 @@ final loggedinpages = RouteMap(routes: {
   '/propertyhome': (_) => const MaterialPage(child: PropertyHome()),
   '/addcomplaint': (_) => MaterialPage(child: AddComplaints()),
   '/complaintshome': (_) => MaterialPage(child: ComplaintsHome()),
-  '/complaintdetails': (q) => MaterialPage( child: ComplaintDetails()),
+  '/complaintdetails': (q) => MaterialPage(child: ComplaintDetails()),
+  '/pickcontact': (_) => MaterialPage(child: ContactPickerPage()),
   '/ownertenantdetails': (_) => MaterialPage(child: OwnertenantScreen()),
   '/propertydetails': (q) => MaterialPage(
           child: PropertyDetails(
@@ -40,6 +42,5 @@ final loggedinpages = RouteMap(routes: {
           child: AddFlats(
         propertyId: q.queryParameters['propertyId']!,
       )),
-  '/flatdetails': (q) => MaterialPage(
-          child: FlatDetails()),
+  '/flatdetails': (q) => MaterialPage(child: FlatDetails()),
 });

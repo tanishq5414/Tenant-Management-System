@@ -73,13 +73,8 @@ class AuthController extends StateNotifier<bool> {
     return user;
       }
 
-  void signOut(BuildContext context) async {
+  void signOut() async {
     state = true;
-    _ref.read(tenantDataProvider.notifier).state = null;
-    _ref.read(ownerDataProvider.notifier).state = null;
-    _ref.read(propertyDataProvider.notifier).state = null;
-    _ref.read(flatDataProvider.notifier).state = null;
-    _ref.read(complaintDataProvider.notifier).state = null;
     final user = _authRepository.signOut();
     state = false;
   }

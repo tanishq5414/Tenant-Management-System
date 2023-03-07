@@ -111,8 +111,8 @@ class _PropertyDetailsState extends ConsumerState<FlatDetails> {
                       )
                     : ElevatedButton(
                         onPressed: () {
-                          Routemaster.of(context)
-                              .push('/addtenant', queryParameters: {
+                          Routemaster.of(context).push('/pickcontact', queryParameters: {
+                            'propertyId': propetyId,
                             'flatId': flat.id,
                           });
                         },
@@ -127,7 +127,7 @@ class _PropertyDetailsState extends ConsumerState<FlatDetails> {
   }
 }
 
-class TenantDetails extends StatelessWidget {
+class TenantDetails extends StatefulWidget {
   const TenantDetails({
     super.key,
     required this.ref,
@@ -140,23 +140,29 @@ class TenantDetails extends StatelessWidget {
   final String tenantId;
 
   @override
+  State<TenantDetails> createState() => _TenantDetailsState();
+}
+
+class _TenantDetailsState extends State<TenantDetails> {
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: ref
+        future: widget.ref
             .read(ownerControllerProvider.notifier)
-            .getTenantData(context: context, tenantid: tenantId),
+            .getTenantData(context: context, tenantid: widget.tenantId),
         builder: (context, snapshot) {
+          print(snapshot.data);
           if (snapshot.hasData) {
             return Column(
               children: [
                 FlatDetailsName(
-                    size: size,
+                    size: widget.size,
                     title: 'Name',
                     subtitle: snapshot.data!.firstName +
                         ' ' +
                         snapshot.data!.lastName),
                 FlatDetailsName(
-                    size: size, title: 'Phone', subtitle: snapshot.data!.phone),
+                    size: widget.size, title: 'Phone', subtitle: snapshot.data!.phone),
               ],
             );
           } else {

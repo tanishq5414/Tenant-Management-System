@@ -54,7 +54,7 @@ class _TenantHomeState extends ConsumerState<TenantHome> {
                       onPressed: () {
                         ref
                             .read(authControllerProvider.notifier)
-                            .signOut(context);
+                            .signOut();
                       },
                       icon: const Icon(
                         OctIcons.sign_out_24,

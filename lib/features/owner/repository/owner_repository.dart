@@ -175,47 +175,50 @@ class OwnerRepository {
   }
 
   // remove tenant
-  void removeTenant(
+  FutureEither<String> removeTenant(
     BuildContext context,
     ownerid,
     propertyid,
     tenantid,
     flatid,
   ) async {
-    _supabaseClient.rpc('remove_tenant', params: {
+    var response = await _supabaseClient.rpc('remove_tenant', params: {
       'ownerid': ownerid,
       'propertyid': propertyid,
       'tenantid': tenantid,
       'flatid': flatid,
     }).then((value) {
-      if (value.error != null) {
-        print(value.error!.message);
-      } else {
-        print(value.data);
-      }
     });
+    if(response == null){
+      return right(tenantid);
+    }
+    else{
+      return left(Failure('error in removing tenant'));
+    }
   }
 
   // add tenant
-  void addTenant(
+  FutureEither<String> addTenant(
     BuildContext context,
     ownerid,
     propertyid,
     tenantid,
     flatid,
   ) async {
-    _supabaseClient.rpc('add_tenant', params: {
+    
+    var response = await _supabaseClient.rpc('add_tenant', params: {
       'ownerid': ownerid,
       'propertyid': propertyid,
       'tenantid': tenantid,
       'flatid': flatid,
     }).then((value) {
-      if (value.error != null) {
-        print(value.error!.message);
-      } else {
-        print(value.data);
-      }
     });
+    if(response == null){
+      return right(tenantid);
+    }
+    else{
+      return left(Failure('error in adding tenant'));
+    }
   }
 
   //get tenant data
@@ -350,6 +353,7 @@ class OwnerRepository {
       }
     ]).execute();
     flatlist.add(flatid);
+    print(flatlist);
     print('flatlist' + flatlist.toString());
 
     var response1 = await _supabaseClient
@@ -359,15 +363,41 @@ class OwnerRepository {
         })
         .eq('id', propertyid)
         .execute();
-    if(response.status == 204 && response1.status == 204){
+    print(response1.data);
+    print(response.status);
+    print(response1.status);
+    if (response.status == 201 && response1.status == 204) {
       return right(flat);
-    }
-    else{
+    } else {
       return left(Failure('Something went wrong'));
     }
   }
 
-  //search for tenan
+  //get tenant data
+  Future<Tenant> getTenantDataByNumber(String tenantnumber) async {
+    //get full table from supabase
+    var a = await _supabaseClient
+        .from('tenant')
+        .select()
+        .eq('phone', tenantnumber)
+        .execute()
+        .then((value) => Tenant(
+              id: value.data[0]['id'],
+              firstName: value.data[0]['firstName'],
+              lastName: value.data[0]['lastName'],
+              email: value.data[0]['email'],
+              phone: value.data[0]['phone'],
+              address: value.data[0]['address'],
+              city: value.data[0]['city'],
+              state: value.data[0]['state'],
+              zip: value.data[0]['zip'],
+              country: value.data[0]['country'],
+              transactions: value.data[0]['transactions'],
+              complaints: value.data[0]['complaints'],
+              flatId: value.data[0]['flat_id'],
+            ));
+    return a;
+  }
 
   Stream<List<FlatsModal>> getAllFlatsData(String ownerid) {
     //get full table from supabase
@@ -397,4 +427,6 @@ class OwnerRepository {
               .toList(),
         );
   }
+
+  
 }

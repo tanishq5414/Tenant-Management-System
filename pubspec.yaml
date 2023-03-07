@@ -48,6 +48,7 @@ dependencies:
   device_preview: ^1.1.0
   flutter_native_splash: ^2.2.16
   change_app_package_name: ^1.1.0
+  contacts_service: ^0.6.3
 
 dev_dependencies:
   flutter_test:

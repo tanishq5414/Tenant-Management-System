@@ -7,7 +7,7 @@ class FlatsModal {
   final String id;
   final String name;
   final String description;
-  final String tenantId;
+  String tenantId;
   final String rent;
   final String deposit;
   final String due;

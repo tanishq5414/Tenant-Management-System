@@ -1,10 +1,13 @@
 // ignore_for_file: unused_import, unused_local_variable
 
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:routemaster/routemaster.dart';
+import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
+import 'package:tenantmgmnt/features/auth/repository/auth_methods.dart';
 import 'package:tenantmgmnt/features/owner/repository/owner_repository.dart';
 import 'package:tenantmgmnt/modal/flats_modal.dart';
 import 'package:tenantmgmnt/modal/owner_modal.dart';
@@ -71,9 +74,6 @@ class OwnerController extends StateNotifier<bool> {
     return _ownerRepository.getAllFlatsData(fid);
   }
 
-
-
-
   void insertOwnerFirstDetails({
     required BuildContext context,
     required String firstName,
@@ -127,11 +127,9 @@ class OwnerController extends StateNotifier<bool> {
     required BuildContext context,
     required String tenantid,
   }) {
-    state = true;
     final user = _ownerRepository.getTenantData(
       tenantid,
     );
-    state = false;
     return user;
   }
 
@@ -141,9 +139,9 @@ class OwnerController extends StateNotifier<bool> {
     required String ownerid,
     required String propertyid,
     required String flatid,
-  }) {
+  }) async {
     state = true;
-    final user = _ownerRepository.addTenant(
+    final user = await _ownerRepository.addTenant(
       context,
       ownerid,
       propertyid,
@@ -151,6 +149,29 @@ class OwnerController extends StateNotifier<bool> {
       flatid,
     );
     state = false;
+    user.fold((l) => Utils.showSnackBar(l.message), (tenantid) {
+      _ref.read(ownerDataProvider.notifier).update((state) => state!.copyWith(
+            tenantList: state.tenantList ?? [] + [tenantid],
+          ));
+
+      _ref.read(propertyDataProvider.notifier).update((state) {
+        state!.forEach((element) {
+          if (element.id == propertyid) {
+            element.tenants = element.tenants + [tenantid];
+          }
+        });
+        return state;
+      });
+
+      _ref.read(allflatsDataProviderOwner.notifier).update((state) {
+        state!.forEach((element) {
+          if (element.id == flatid) {
+            element.tenantId = tenantid;
+          }
+        });
+        return state;
+      });
+    });
   }
 
   void removeTenant({
@@ -159,14 +180,56 @@ class OwnerController extends StateNotifier<bool> {
     required String ownerid,
     required String propertyid,
     required String flatid,
-  }) {
-    final user = _ownerRepository.removeTenant(
+  }) async {
+    final user = await _ownerRepository.removeTenant(
       context,
       ownerid,
       propertyid,
       tenantid,
       flatid,
     );
+    user.fold((l) => Utils.showSnackBar(l.message), (tenantid) {
+      _ref.read(ownerDataProvider.notifier).update((state) => state!.copyWith(
+            tenantList: state.tenantList!
+                .where((element) => element != tenantid)
+                .toList(),
+          ));
+
+      _ref.read(propertyDataProvider.notifier).update((state) {
+        state!.forEach((element) {
+          if (element.id == propertyid) {
+            element.tenants = element.tenants
+                .where((element) => element != tenantid)
+                .toList();
+          }
+        });
+        return state;
+      });
+
+      _ref.read(allflatsDataProviderOwner.notifier).update((state) {
+        state!.forEach((element) {
+          if (element.id == flatid) {
+            element.tenantId = '';
+          }
+        });
+        return state;
+      });
+    });
+  }
+
+  Future<Tenant> getTenantDataByNumber({required String number}) {
+    if (number.startsWith('+91')) {
+      number = number.substring(3);
+    } else if (number.startsWith('91')) {
+      number = number.substring(2);
+    }
+    if (number.startsWith('0')) {
+      number = number.substring(1);
+    }
+    final user = _ownerRepository.getTenantDataByNumber(
+      number.trim(),
+    );
+    return user;
   }
 
   void addFlat({
@@ -206,9 +269,10 @@ class OwnerController extends StateNotifier<bool> {
       _ref.read(propertyDataProvider.notifier).update((state) {
         state!.forEach((element) {
           if (element.id == propertyid) {
-            element.flats!.add(r.id);
+            element.flats.add(r.id);
           }
         });
+        return state;
       });
     });
   }

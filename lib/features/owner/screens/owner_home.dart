@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_octicons/flutter_octicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
@@ -23,14 +24,19 @@ class _OwnerHomeScreenState extends ConsumerState<OwnerHomeScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     var isLoading = ref.watch(ownerControllerProvider);
-    var user = ref.watch(ownerDataProvider)!;
+    var user = ref.watch(ownerDataProvider);
     var complaints = ref.watch(complaintDataProviderOwner) ?? [];
     return isLoading? const Loader(): Container(
       color: appBackgroundColor,
-      child: SafeArea(
+      child: (user==null)?const Loader(): SafeArea(
         child: Scaffold(
           backgroundColor: appBackgroundColor,
           appBar: CustomAppBar(
+            actions: [
+              IconButton(onPressed: (){
+                ref.read(authControllerProvider.notifier).signOut();
+              }, icon: const Icon(OctIcons.sign_out_16, color: appBlackColor,)),
+            ],
             title: 'Dashboard',
             showbackbutton: false,
           ),

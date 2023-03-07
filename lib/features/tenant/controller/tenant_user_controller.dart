@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/owner/repository/owner_repository.dart';
-import 'package:tenantmgmnt/features/tenant/repository/tenant_repository.dart';
+import 'package:tenantmgmnt/features/tenant/repository/tenant_user_repository.dart';
 import 'package:tenantmgmnt/modal/complaints_modal.dart';
 import 'package:tenantmgmnt/modal/flats_modal.dart';
 import 'package:tenantmgmnt/modal/owner_modal.dart';
@@ -16,6 +16,7 @@ import '../../components/snack_bar.dart';
 final tenantDataProvider = StateProvider<Tenant?>((ref) => null);
 final flatDataProvider = StateProvider<FlatsModal?>((ref) => null);
 final complaintDataProvider = StateProvider<List<Complaint>?>((ref) => null);
+
 
 final tenantControllerProvider = StateNotifierProvider<TenantController, bool>(
   (ref) => TenantController(
@@ -45,7 +46,10 @@ class TenantController extends StateNotifier<bool> {
       {required TenantRepository tenantRepository, required Ref ref})
       : _tenantRepository = tenantRepository,
         _ref = ref,
-        super(false);
+        super(
+          false,);
+
+
 
   Stream<Tenant> getTenantDetails(uid) {
     return _tenantRepository.getTenantDetails(uid);

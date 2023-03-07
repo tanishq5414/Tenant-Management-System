@@ -183,7 +183,7 @@ class _AddPropertyState extends ConsumerState<AddProperty> {
                             propertyarea: propertyarea.text,
                             propertycity: propertycity.text,
                             propertystate: propertystate.text,
-                            userpropertylist: user.propertyList!,
+                            userpropertylist: user.propertyList??[],
                             propertyzipcode: propertyzip.text,
                             propertyimage: i,
                           );

@@ -106,18 +106,19 @@ class AuthRepository {
   }
 
   //tenant or owner sign up
-  Stream<UserType> tenantorowner(uid) {
-    var response = _supabaseClient
+Future<UserType> tenantorowner(uid) async {
+    var response = await _supabaseClient
         .from('user_details')
-        .stream(primaryKey: ['id'])
+        .select()
         .eq('id', uid)
-        .map((event) {
-          return UserType(
-            id: event.elementAt(0)['id'],
-            user_type: event.elementAt(0)['user_type'],
-          );
-        });
-    return response;
+        .execute();
+    var data = response.data as List;
+    var user = data.first;
+    UserType user1 = UserType(
+      id: user['id'],
+      user_type: user['user_type'],
+    );
+    return user1;
   }
 
   FutureEither<Tenant> insertTenantFirstDetails(

@@ -9,7 +9,7 @@ import 'package:tenantmgmnt/features/components/snack_bar.dart';
 import 'package:tenantmgmnt/features/components/text_controller.dart';
 import 'package:tenantmgmnt/features/components/custom_app_bar.dart';
 import 'package:tenantmgmnt/features/owner/controller/owner_controller.dart';
-import 'package:tenantmgmnt/features/tenant/controller/tenant_controller.dart';
+import 'package:tenantmgmnt/features/tenant/controller/tenant_user_controller.dart';
 import 'package:tenantmgmnt/themes/colors.dart';
 
 class AddComplaints extends ConsumerStatefulWidget {

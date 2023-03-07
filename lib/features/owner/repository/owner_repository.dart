@@ -92,7 +92,7 @@ class OwnerRepository {
   }
 
   // add properties
-  void addProperty(
+  FutureEither<Property> addProperty(
     BuildContext context,
     List propertyList,
     String propertyName,
@@ -103,8 +103,20 @@ class OwnerRepository {
     String propertyimage,
   ) async {
     final user = _auth.currentUser!;
-    var propertyid = Uuid().v4();
+    var propertyid = const Uuid().v4();
     propertyList.add(propertyid);
+    Property property = Property(
+      id: propertyid,
+      ownerId: user.uid,
+      name: propertyName,
+      area: propertyArea,
+      city: propertyCity,
+      state: propertyState,
+      zip: propertyZip,
+      tenants: [],
+      image: propertyimage,
+      flats: [],
+    );
     var response1 = await _supabaseClient.from('property').insert([
       {
         'id': propertyid,
@@ -126,6 +138,12 @@ class OwnerRepository {
         })
         .eq('id', user.uid)
         .execute();
+    if (response.status != 204) {
+      print('error in adding property');
+      return left(Failure(response.data));
+    }
+    print('response status' + response.status.toString());
+    return right(property);
   }
 
   Stream<List<Property>> getPropertyData(String uid) {
@@ -224,7 +242,6 @@ class OwnerRepository {
               complaints: value.data[0]['complaints'],
               flatId: value.data[0]['flat_id'],
             ));
-    print(a.runtimeType);
     return a;
   }
 
@@ -257,12 +274,15 @@ class OwnerRepository {
   }
 
   Stream<OwnerModal> getOwnerData(String uid) {
+    print('get owner data called');
     Stream<OwnerModal> user;
+    print(uid);
     user = _supabaseClient
         .from('owner')
         .stream(primaryKey: ['id'])
         .eq('id', uid)
         .map((event) {
+          print(event);
           return OwnerModal(
               id: event.elementAt(0)['id'],
               firstName: event.elementAt(0)['firstName'],
@@ -285,7 +305,7 @@ class OwnerRepository {
   }
 
   // add Flats
-  void addFlat(
+  FutureEither<FlatsModal> addFlat(
     BuildContext context,
     String name,
     String description,
@@ -298,10 +318,23 @@ class OwnerRepository {
     List flatlist,
     String propertyid,
     String ownerid,
-  ) {
+  ) async {
     var flatid = Uuid().v4();
     print('flatid' + flatid);
-    var response = _supabaseClient.from('flats').insert([
+    var flat = FlatsModal(
+        id: flatid,
+        name: name,
+        description: description,
+        tenantId: tenantId,
+        rent: rent,
+        deposit: deposit,
+        due: due,
+        complaints: complaints,
+        payments: payments,
+        propertyId: propertyid,
+        ownerId: ownerid,
+        lastPaymentDate: '');
+    var response = await _supabaseClient.from('flats').insert([
       {
         'id': flatid,
         'name': name,
@@ -319,68 +352,22 @@ class OwnerRepository {
     flatlist.add(flatid);
     print('flatlist' + flatlist.toString());
 
-    var response1 = _supabaseClient
+    var response1 = await _supabaseClient
         .from('property')
         .update({
           'flats': flatlist,
         })
         .eq('id', propertyid)
         .execute();
+    if(response.status == 204 && response1.status == 204){
+      return right(flat);
+    }
+    else{
+      return left(Failure('Something went wrong'));
+    }
   }
 
-  FutureEither<FlatsModal> getSingleFlatData(String flatid) async {
-    var response1 =
-        await _supabaseClient.from('flats').select().eq('id', flatid).execute();
-    if (response1.data == null) {
-      return left(Failure(response1.data));
-    }
-    return right(
-      FlatsModal(
-        id: response1.data.elementAt(0)['id'],
-        name: response1.data.elementAt(0)['name'],
-        description: response1.data.elementAt(0)['description'],
-        tenantId: response1.data.elementAt(0)['tenantId'],
-        rent: response1.data.elementAt(0)['rent'],
-        deposit: response1.data.elementAt(0)['deposit'],
-        due: response1.data.elementAt(0)['due'],
-        lastPaymentDate: response1.data.elementAt(0)['lastPaymentDate'],
-        complaints: response1.data.elementAt(0)['complaints'],
-        payments: response1.data.elementAt(0)['payments'],
-        propertyId: response1.data.elementAt(0)['propertyId'],
-        ownerId: response1.data.elementAt(0)['ownerId'],
-      ),
-    );
-  }
-
-  Future<List<FlatsModal>> getFlatData(String propertyid) async {
-    List<FlatsModal> flatlist = [];
-    var a = await _supabaseClient
-        .from('flats')
-        .select()
-        .eq('propertyId', propertyid)
-        .execute()
-        .then((value) => value.data);
-    for (var i = 0; i < a.length; i++) {
-      flatlist.add(
-        FlatsModal(
-          id: a.elementAt(i)['id'],
-          name: a.elementAt(i)['name'],
-          description: a.elementAt(i)['description'],
-          tenantId: a.elementAt(i)['tenantId'],
-          rent: a.elementAt(i)['rent'],
-          deposit: a.elementAt(i)['deposit'],
-          due: a.elementAt(i)['due'],
-          lastPaymentDate: a.elementAt(i)['lastPaymentDate'],
-          complaints: a.elementAt(i)['complaints'],
-          payments: a.elementAt(i)['payments'],
-          propertyId: a.elementAt(i)['propertyId'],
-          ownerId: a.elementAt(i)['ownerId'],
-        ),
-      );
-    }
-    print(flatlist);
-    return flatlist;
-  }
+  //search for tenan
 
   Stream<List<FlatsModal>> getAllFlatsData(String ownerid) {
     //get full table from supabase

@@ -17,7 +17,7 @@ import 'package:tenantmgmnt/core/type_def.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
 import 'package:tenantmgmnt/features/auth/showOtp.dart';
 import 'package:tenantmgmnt/features/components/snack_bar.dart';
-import 'package:tenantmgmnt/features/tenant/controller/tenant_controller.dart';
+import 'package:tenantmgmnt/features/tenant/controller/tenant_user_controller.dart';
 import 'package:tenantmgmnt/modal/complaints_modal.dart';
 import 'package:tenantmgmnt/modal/flats_modal.dart';
 import 'package:tenantmgmnt/modal/owner_modal.dart';
@@ -167,8 +167,8 @@ class TenantRepository {
               country: event.elementAt(0)['country'],
               zip: event.elementAt(0)['zip'],
               flatId: event.elementAt(0)['flat_id'],
-              transactions: event.elementAt(0)['transactions']??[],
-              complaints: event.elementAt(0)['complaints']??[],
+              transactions: event.elementAt(0)['transactions'] ?? [],
+              complaints: event.elementAt(0)['complaints'] ?? [],
             ));
   }
 

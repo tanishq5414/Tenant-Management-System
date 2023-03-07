@@ -71,23 +71,8 @@ class OwnerController extends StateNotifier<bool> {
     return _ownerRepository.getAllFlatsData(fid);
   }
 
-  Future<FlatsModal> getSingleFlatData(String fid) async {
-    var FlatsData1;
-    print(fid);
-    var a = await _ownerRepository.getSingleFlatData(fid);
-    a.fold((l) => Utils.showSnackBar(l.message), (FlatsData) {
-      print(FlatsData);
-      return FlatsData;
-    });
-    print(FlatsData1);
-    return FlatsData1;
-  }
 
-  Future<List<dynamic>> getFlatData(pid) {
-    print("getFlatData");
-    var a = _ownerRepository.getFlatData(pid);
-    return a;
-  }
+
 
   void insertOwnerFirstDetails({
     required BuildContext context,
@@ -97,8 +82,10 @@ class OwnerController extends StateNotifier<bool> {
     required String phone,
     required String typeofuser,
   }) async {
+    state = true;
     final user = await _ownerRepository.insertOwnerFirstDetails(
         context, firstName, lastName, email, phone, typeofuser);
+    state = false;
     user.fold((l) => Utils.showSnackBar(l.message), (userModel) {
       _ref.read(ownerDataProvider.notifier).update((state) => userModel);
     });
@@ -114,8 +101,9 @@ class OwnerController extends StateNotifier<bool> {
     required String propertystate,
     required String propertyzipcode,
     required String propertyimage,
-  }) {
-    final user = _ownerRepository.addProperty(
+  }) async {
+    state = true;
+    var property = await _ownerRepository.addProperty(
         context,
         userpropertylist,
         propertyname,
@@ -124,16 +112,26 @@ class OwnerController extends StateNotifier<bool> {
         propertystate,
         propertyzipcode,
         propertyimage);
+    state = false;
+    property.fold((l) => Utils.showSnackBar(l.message), (propertyModel) {
+      _ref
+          .read(propertyDataProvider.notifier)
+          .update((state) => state! + [propertyModel]);
+      _ref.read(ownerDataProvider.notifier).update((state) => state!.copyWith(
+            propertyList: state.propertyList! + [propertyModel.id],
+          ));
+    });
   }
 
   Future<Tenant> getTenantData({
     required BuildContext context,
     required String tenantid,
   }) {
+    state = true;
     final user = _ownerRepository.getTenantData(
       tenantid,
     );
-    print(user.toString());
+    state = false;
     return user;
   }
 
@@ -144,6 +142,7 @@ class OwnerController extends StateNotifier<bool> {
     required String propertyid,
     required String flatid,
   }) {
+    state = true;
     final user = _ownerRepository.addTenant(
       context,
       ownerid,
@@ -151,6 +150,7 @@ class OwnerController extends StateNotifier<bool> {
       tenantid,
       flatid,
     );
+    state = false;
   }
 
   void removeTenant({
@@ -182,8 +182,9 @@ class OwnerController extends StateNotifier<bool> {
     required List flatlist,
     required String propertyid,
     required String ownerid,
-  }) {
-    final user = _ownerRepository.addFlat(
+  }) async {
+    state = true;
+    final user = await _ownerRepository.addFlat(
       context,
       flatname,
       description,
@@ -197,5 +198,18 @@ class OwnerController extends StateNotifier<bool> {
       propertyid,
       ownerid,
     );
+    state = false;
+    user.fold((l) => Utils.showSnackBar(l.message), (r) {
+      _ref
+          .read(allflatsDataProviderOwner.notifier)
+          .update((state) => state! + [r]);
+      _ref.read(propertyDataProvider.notifier).update((state) {
+        state!.forEach((element) {
+          if (element.id == propertyid) {
+            element.flats!.add(r.id);
+          }
+        });
+      });
+    });
   }
 }

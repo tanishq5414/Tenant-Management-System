@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:tenantmgmnt/features/tenant/controller/tenant_controller.dart';
+import 'package:tenantmgmnt/features/tenant/controller/tenant_user_controller.dart';
 
 class ComplaintStatusControllerComponentPending extends ConsumerStatefulWidget {
   const ComplaintStatusControllerComponentPending({

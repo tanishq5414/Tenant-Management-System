@@ -23,12 +23,19 @@ class _PropertyDetailsState extends ConsumerState<PropertyDetails> {
   @override
   Widget build(BuildContext context) {
     var ownerData = ref.watch(ownerDataProvider)!;
-    var data = ref.watch(propertyDataProvider)!;
+    var propertydata = ref.watch(propertyDataProvider)!;
+    var flatsdata = ref.watch(allflatsDataProviderOwner)!;
+    List<FlatsModal> flatslist = [];
     var size = MediaQuery.of(context).size;
     getList() {
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].id == widget.propertyId) {
-          propertyData = data[i];
+      for (var i = 0; i < propertydata.length; i++) {
+        if (propertydata[i].id == widget.propertyId) {
+          propertyData = propertydata[i];
+        }
+      }
+      for (var i = 0; i < flatsdata.length; i++) {
+        if (flatsdata[i].propertyId == widget.propertyId) {
+          flatslist.add(flatsdata[i]);
         }
       }
       setState(() {
@@ -72,24 +79,28 @@ class _PropertyDetailsState extends ConsumerState<PropertyDetails> {
                       SizedBox(
                         height: size.width * 0.08,
                       ),
-                      FutureBuilder(
-                        future: ref
-                            .read(ownerControllerProvider.notifier)
-                            .getFlatData(propertyData.id),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return ListView.builder(
+                      (flatslist.isEmpty)
+                          ? const Center(
+                              child: Text(
+                                'No Flats Added',
+                                style: TextStyle(
+                                  color: appAccentColor,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: snapshot.data!.length,
+                              itemCount: flatslist.length,
                               shrinkWrap: true,
                               itemBuilder: (context, index) {
                                 return InkWell(
                                   onTap: () {
-                                    Routemaster.of(context).push(
-                                        '/flatdetails', queryParameters: {
+                                    Routemaster.of(context)
+                                        .push('/flatdetails', queryParameters: {
                                       'propertyId': widget.propertyId,
-                                      'flatId': snapshot.data![index].id,
-                                        });
+                                      'flatId': flatslist[index].id,
+                                    });
                                   },
                                   child: Container(
                                     height: size.width * 0.3,
@@ -114,7 +125,7 @@ class _PropertyDetailsState extends ConsumerState<PropertyDetails> {
                                                 CrossAxisAlignment.end,
                                             children: [
                                               Text(
-                                                snapshot.data![index].name,
+                                                flatslist[index].name,
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 15),
@@ -129,7 +140,7 @@ class _PropertyDetailsState extends ConsumerState<PropertyDetails> {
                                               ),
                                               Text(
                                                 '\u{20B9}' +
-                                                    snapshot.data![index].rent,
+                                                    flatslist[index].rent,
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 20),
@@ -164,7 +175,7 @@ class _PropertyDetailsState extends ConsumerState<PropertyDetails> {
                                               ),
                                               Text(
                                                 '\u{20B9}' +
-                                                    snapshot.data![index].rent,
+                                                    flatslist[index].rent,
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 13),
@@ -177,14 +188,7 @@ class _PropertyDetailsState extends ConsumerState<PropertyDetails> {
                                   ),
                                 );
                               },
-                            );
-                          } else {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                        },
-                      ),
+                            ),
                       SizedBox(
                         height: size.width * 0.2,
                       )

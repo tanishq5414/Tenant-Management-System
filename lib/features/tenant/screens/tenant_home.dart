@@ -5,7 +5,7 @@ import 'package:flutter_octicons/flutter_octicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
-import 'package:tenantmgmnt/features/tenant/controller/tenant_controller.dart';
+import 'package:tenantmgmnt/features/tenant/controller/tenant_user_controller.dart';
 import 'package:tenantmgmnt/modal/flats_modal.dart';
 import 'package:tenantmgmnt/modal/tenant_modal.dart';
 import 'package:tenantmgmnt/themes/colors.dart';

@@ -7,6 +7,7 @@ import 'package:routemaster/routemaster.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:tenantmgmnt/core/error_text.dart';
 import 'package:tenantmgmnt/core/providers/apikeys.dart';
+import 'package:tenantmgmnt/core/providers/providerobserver.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
 import 'package:tenantmgmnt/features/components/snack_bar.dart';
 import 'package:tenantmgmnt/features/owner/controller/owner_controller.dart';
@@ -21,6 +22,9 @@ void main() async {
     anonKey: supabaseApiPublicKey,
   );
   runApp(ProviderScope(
+      observers: [
+        Logger(),
+      ],
       child:
           DevicePreview(enabled: false, builder: (context) => const MyApp())));
 }
@@ -49,8 +53,9 @@ class _MyAppState extends ConsumerState<MyApp> {
                     initialization() async {
                       var a = await ref
                           .read(authControllerProvider.notifier)
-                          .tenantorowner(data.uid).first;
-                      var user = ref.read(userTypeProvider.notifier).update((state) => a);
+                          .tenantorowner(data.uid);
+                      ref.read(userTypeProvider.notifier).update((state) => a);
+                      print(ref.read(userTypeProvider)!.id);
                       FlutterNativeSplash.remove();
                     }
 

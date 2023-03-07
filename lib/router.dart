@@ -4,7 +4,7 @@ import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/auth/showOtp.dart';
 import 'package:tenantmgmnt/features/auth/signin_main.dart';
 import 'package:tenantmgmnt/features/auth/signup/signupdata.dart';
-import 'package:tenantmgmnt/features/home/home.dart';
+import 'package:tenantmgmnt/features/home/loading_providers.dart';
 import 'package:tenantmgmnt/features/owner/screens/add_flats.dart';
 import 'package:tenantmgmnt/features/owner/screens/add_property.dart';
 import 'package:tenantmgmnt/features/owner/screens/owner_home.dart';

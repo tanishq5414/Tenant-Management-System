@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/auth/controller/auth_controller.dart';
 import 'package:tenantmgmnt/features/components/custom_app_bar.dart';
+import 'package:tenantmgmnt/features/components/loader.dart';
 import 'package:tenantmgmnt/features/owner/controller/owner_controller.dart';
 import 'package:tenantmgmnt/modal/property_modal.dart';
 import 'package:tenantmgmnt/themes/colors.dart';
@@ -17,13 +18,11 @@ class PropertyHome extends ConsumerStatefulWidget {
 
 class _PropertyHomeState extends ConsumerState<PropertyHome> {
   @override
-  
-
-  @override
   Widget build(BuildContext context) {
-    var data = ref.watch(propertyDataProvider)!;
+    var isLoading = ref.watch(ownerControllerProvider);
+    var data = ref.watch(propertyDataProvider) ?? [];    
     var size = MediaQuery.of(context).size;
-    return Container(
+    return isLoading ? Loader(): Container(
       color: appBackgroundColor,
       child: SafeArea(
         child: Scaffold(

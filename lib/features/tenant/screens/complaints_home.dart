@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:tenantmgmnt/features/tenant/components/complaints_status_pending.dart';
-import 'package:tenantmgmnt/features/tenant/controller/tenant_controller.dart';
+import 'package:tenantmgmnt/features/tenant/controller/tenant_user_controller.dart';
 import 'package:tenantmgmnt/themes/colors.dart';
 
 import '../../components/custom_app_bar.dart';
